@@ -1,0 +1,87 @@
+includes:
+  - nginx/config.yaml
+  - subconfigs/elk.config.yaml
+
+globals:
+  restartmode:
+    type: string
+    usage: Restart mode for services
+    default: unless-stopped
+    choices: restart
+  volumepath:
+    type: string
+    usage: Path where data will be stored
+    default: "."
+
+suricata:
+  interfaces:
+    type: string
+    usage: List of interfaces to monitor
+    choices: interfaces
+  logs:
+    file:
+      type: optional
+      usage: Enable Suricata logs ?
+      default: true
+      hostPath:
+        type: string
+        usage: Path where Suricata logs will be stored
+        default: suricata-logs
+      internalPath:
+        type: string
+        usage: Path where Suricata logs will be stored inside the container
+        default: /var/log/suricata
+
+registry:
+  type: string
+  usage: Docker registry to use
+  default: ghcr.io/stamusnetworks
+
+scirius:
+  type: optional
+  usage: Enable Scirius instance ?
+  default: true
+  version:
+    type: string
+    usage: Scirius version to install
+    default: selks
+  debug:
+    type: bool
+    usage: Enable debug mode
+    default: false
+
+arkimeviewer:
+  type: optional
+  usage: Enable Arkime Viewer instance ?
+  default: false
+  version:
+    type: string
+    usage: Arkime version to install
+    default: master
+
+evebox:
+  type: optional
+  usage: Enable Evebox instance ?
+  default: false
+  version:
+    type: string
+    usage: Evebox version to install
+    default: master
+
+db:
+  type: optional
+  usage: Enable internal database ?
+  default: true
+  host:
+    type: string
+    usage: Database host
+    default: db
+
+dbExternal:
+  type: optional
+  usage: Enable external database ?
+  default: false
+  host:
+    type: string
+    usage: Database host
+    default: localhost
