@@ -1,6 +1,10 @@
 stages:
     - docker
 
+default:
+  tags:
+    - k8s-small
+
 selks:
     stage: docker
     before_script: []
@@ -8,9 +12,8 @@ selks:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor \
             --context "${CI_PROJECT_DIR}/." \
             --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
             --destination "${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_SHORT_SHA}" \
@@ -26,9 +29,8 @@ tests:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor \
             --build-arg "path=/tests" \
             --context "${CI_PROJECT_DIR}/." \
             --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
