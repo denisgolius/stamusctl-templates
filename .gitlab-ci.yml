@@ -40,7 +40,7 @@ tests:
             --cache-copy-layers=true
             --cache-ttl=24h
 
-cndr:
+clearndr:
     stage: docker
     before_script: []
     image:
@@ -49,11 +49,11 @@ cndr:
     script:
         - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
         - /kaniko/executor
-            --build-arg "path=/cndr"
+            --build-arg "path=/clearndr"
             --context "${CI_PROJECT_DIR}/."
             --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-            --destination "${CI_REGISTRY_IMAGE}/cndr:${CI_COMMIT_SHORT_SHA}"
-            --destination "${CI_REGISTRY_IMAGE}/cndr:${CI_COMMIT_BRANCH}"
+            --destination "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_SHORT_SHA}"
+            --destination "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}"
             --cache=true
             --cache-copy-layers=true
             --cache-ttl=24h
