@@ -13,3 +13,4 @@ nginx:
     type: string
     usage: Nginx exec type
     choices: nginx
+    default: nginx

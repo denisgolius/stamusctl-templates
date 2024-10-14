@@ -1,9 +1,9 @@
 services:
   {{- if .nginx}}
   nginx:
-    image: {{- .nginx.image}}
+    image: {{.nginx.image}}
     container_name: nginx
-    restart: always
+    restart: {{ .globals.restartmode | default "unless-stopped" }}
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d/
     ports:
@@ -20,7 +20,7 @@ services:
     environment:
       - WEBSOCKET_PORT={{- template "websocketport" .}}
       - RESPONSE={{- .websocket.response}}
-    restart: always
+    restart: {{ .globals.restartmode | default "unless-stopped" }}
     {{- if not .nginx}}
     ports:
       - 80:{{- template "websocketport" .}}
