@@ -79,26 +79,8 @@ else
 fi
 
 if [ -n "$KIBANA_RESET_DASHBOARDS" ]; then
-    /opt/scirius/bin/reset_dashboards.sh &
+    echo "Resetting Kibana dashboards..."
+    /opt/scirius/docker/scirius/bin/reset_dashboards.sh
 fi
-
-# while true; do
-#     ELASTICSEARCH_ADDRESS=$(python manage.py diffsettings --all | grep 'ELASTICSEARCH_ADDRESS' | cut -d"'" -f 2)
-#     echo "found elastic address : $ELASTICSEARCH_ADDRESS"
-#     response=$(curl -X PUT "$ELASTICSEARCH_ADDRESS/logstash-stats/_settings" -H 'Content-Type: application/json' -d'
-#     {
-#         "index.mapping.total_fields.limit": 2000
-#     }
-#  ')
-
-#     if [[ $response == *"\"acknowledged\":true"* ]]; then
-#         echo "max field set"
-#         break
-#     else
-#         echo "settings :"
-#         echo $response
-#         sleep 5
-#     fi
-# done
 
 start
