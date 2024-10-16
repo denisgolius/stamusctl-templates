@@ -75,10 +75,6 @@ services:
         environment:
             - plugins.security.disabled=true
             - discovery.type=single-node
-            - OPENSEARCH_PATH_CONF=/etc/opensearch
-        configs:
-            - source: opensearch-config
-              target: /etc/opensearch/opensearch.yml
         volumes:
             - ${ELASTIC_DATAPATH:-elastic-data}:/usr/share/opensearch/data
         ports:
