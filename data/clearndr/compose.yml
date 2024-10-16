@@ -65,7 +65,7 @@ services:
     elasticsearch:
         container_name: elasticsearch
         image: opensearchproject/opensearch:1
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
             interval: 10s
@@ -92,7 +92,7 @@ services:
         build:
             context: opensearch-dashboard
             dockerfile: Dockerfile
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         configs:
             - source: opensearch-config
               target: /usr/share/opensearch-dashboards/config/opensearch.yml
@@ -137,7 +137,7 @@ services:
         container_name: suricata
         image: jasonish/suricata:master-amd64
         entrypoint: /new_entrypoint.sh
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         configs:
             - source: suricata-new-entrypoint
               target: /new_entrypoint.sh
@@ -159,7 +159,7 @@ services:
     scirius:
         container_name: scirius
         image: git.stamus-networks.com:4567/devel/scirius/selks:selks-image-latest
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s
             timeout: 1s
@@ -211,7 +211,7 @@ services:
         container_name: evebox
         image: jasonish/evebox:master
         command: ['-e', 'http://elasticsearch:9200']
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         environment:
             - EVEBOX_HTTP_TLS_ENABLED=false
             - EVEBOX_AUTHENTICATION_REQUIRED=false
@@ -227,7 +227,7 @@ services:
               target: /etc/nginx/nginx.conf
             - source: nginx-selks-config
               target: /etc/nginx/conf.d/selks6.conf
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD', 'service', 'nginx', 'status']
             interval: 10s
@@ -265,7 +265,7 @@ services:
               target: /etc/periodic/daily/scirius-update-suri-rules.sh
             - source: cron-jobs-suricata-logrotate
               target: /etc/periodic/daily/suricata-logrotate.sh
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
 
