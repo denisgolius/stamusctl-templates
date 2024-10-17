@@ -7,53 +7,63 @@ default:
 
 selks:
     stage: docker
-    before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
     script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
-            --context "${CI_PROJECT_DIR}/."
-            --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-            --destination "${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_SHORT_SHA}"
-            --destination "${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_BRANCH}"
-            --cache=true
-            --cache-copy-layers=true
-            --cache-ttl=24h
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build
+            "${CI_PROJECT_DIR}/."
+            -f "${CI_PROJECT_DIR}/Dockerfile"
+            -t "${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_SHORT_SHA}"
+            -t "${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_BRANCH}"
+        - docker push ${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/selks:${CI_COMMIT_BRANCH}
 
 tests:
     stage: docker
-    before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
     script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build
+            "${CI_PROJECT_DIR}/."
+            -f "${CI_PROJECT_DIR}/Dockerfile"
             --build-arg "path=/tests"
-            --context "${CI_PROJECT_DIR}/."
-            --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-            --destination "${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_SHORT_SHA}"
-            --destination "${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_BRANCH}"
-            --cache=true
-            --cache-copy-layers=true
-            --cache-ttl=24h
+            -t "${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_SHORT_SHA}"
+            -t "${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_BRANCH}"
+        - docker push ${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/tests:${CI_COMMIT_BRANCH}
+
 
 clearndr:
     stage: docker
-    before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
     script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build
+            "${CI_PROJECT_DIR}/."
+            -f "${CI_PROJECT_DIR}/Dockerfile"
             --build-arg "path=/clearndr"
-            --context "${CI_PROJECT_DIR}/."
-            --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-            --destination "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_SHORT_SHA}"
-            --destination "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}"
-            --cache=true
-            --cache-copy-layers=true
-            --cache-ttl=24h
+            -t "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_SHORT_SHA}"
+            -t "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}"
+        - docker push ${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}
