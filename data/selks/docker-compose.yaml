@@ -138,7 +138,7 @@ services:
   scirius:
     container_name: scirius
     image: {{.registry | default "ghcr.io/stamusnetworks"}}/scirius:{{.SciriusVersion | default "master"}}
-    restart: {{ .globals.restartmode | default "unless-stopped" | default "unless-stopped"}}
+    restart: {{ .globals.restartmode | default "unless-stopped" }}
     depends_on:
       db:
         condition: service_healthy
