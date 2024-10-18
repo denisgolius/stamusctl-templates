@@ -238,7 +238,8 @@ services:
                 condition: service_healthy
         volumes:
             - scirius-static:/static/:ro
-            - ./containers-data/nginx/ssl:/etc/nginx/ssl:ro
+            - ./configs/nginx/ssl:/etc/nginx/ssl:ro
+
         ports:
             - 443:443
         networks:
