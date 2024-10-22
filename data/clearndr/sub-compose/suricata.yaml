@@ -1,0 +1,69 @@
+configs:
+    suricata-new-entrypoint:
+        file: ../configs/suricata/new_entrypoint.sh
+    suricata-selks6-addin:
+        file: ../configs/suricata/selks6-addin.yaml
+
+volumes:
+    suricata-rules: #for suricata rules transfer between scirius and suricata and for persistency
+    suricata-run: #path where the suricata socket resides
+    suricata-logs:
+    suricata-logrotate:
+        driver_opts:
+            type: none
+            o: bind
+            device: ../containers-data/suricata/logrotate
+
+services:
+    suricata:
+        image: jasonish/suricata:master-amd64
+        entrypoint: /new_entrypoint.sh
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        configs:
+            - source: suricata-new-entrypoint
+              target: /new_entrypoint.sh
+            - source: suricata-selks6-addin
+              target: /etc/suricata-configs/selks6-addin.yaml
+        environment:
+            - SURICATA_OPTIONS= -i {{.suricata.interfaces | default "dummy0"}} -vvv --set sensor-name=suricata
+        cap_add:
+            - NET_ADMIN
+            - SYS_NICE
+        network_mode: host
+        volumes:
+            - ../containers-data/suricata/logs:/var/log/suricata
+            - suricata-rules:/etc/suricata/rules
+            - suricata-run:/var/run/suricata/
+            - ../containers-data/suricata/etc:/etc/suricata
+            - ../containers-data/suricata/logrotate:/etc/logrotate.d/
+
+    init-pcap:
+        image: busybox
+        entrypoint: /bin/sh -c
+        command: ['chown -R 1000:1000 /replay']
+        restart: on-failure
+        volumes:
+            - ../containers-data/suricata/replay:/replay
+
+    read-pcap:
+        image: jasonish/suricata:master-amd64-profiling
+        entrypoint: /new_entrypoint.sh
+        command: ["-k none --pcap-file-continuous -r /replay --runmode autofp -l /var/log/suricata --set sensor-name={{.suricata.interfaces | default "dummy0"}}"]
+        restart: on-failure
+        configs:
+            - source: suricata-new-entrypoint
+              target: /new_entrypoint.sh
+            - source: suricata-selks6-addin
+              target: /etc/suricata-configs/selks6-addin.yaml
+        volumes:
+            - ../containers-data/suricata/logs:/var/log/suricata
+            - suricata-rules:/etc/suricata/rules
+            - suricata-run:/var/run/suricata/
+            - ../containers-data/suricata/etc:/etc/suricata
+            - ../containers-data/suricata/replay:/replay
+        cap_add:
+            - NET_ADMIN
+            - SYS_NICE
+        depends_on:
+            init-pcap:
+                condition: service_completed_successfully

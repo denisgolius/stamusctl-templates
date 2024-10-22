@@ -1,0 +1,47 @@
+configs:
+    nginx-config:
+        file: ../configs/nginx/nginx.conf
+    nginx-selks-config:
+        file: ../configs/nginx/conf.d/selks6.conf
+
+volumes:
+    nginx-ssl:
+
+services:
+    ssl-keygen:
+        image: nginx:1.27
+        command: ['/bin/bash', '-c', 'openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca']
+        restart: on-failure
+        volumes:
+            - nginx-ssl:/etc/nginx/ssl
+        ports:
+            - 443:443
+        networks:
+            network:
+
+    nginx:
+        image: nginx:1.27
+        command: ['${NGINX_EXEC:-nginx}', '-g', 'daemon off;']
+        configs:
+            - source: nginx-config
+              target: /etc/nginx/nginx.conf
+            - source: nginx-selks-config
+              target: /etc/nginx/conf.d/selks6.conf
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        healthcheck:
+            test: ['CMD', 'service', 'nginx', 'status']
+            interval: 10s
+            timeout: 2s
+            retries: 5
+        volumes:
+            - scirius-static:/static/:ro
+            - nginx-ssl:/etc/nginx/ssl:ro
+        depends_on:
+            ssl-keygen:
+                condition: service_completed_successfully
+            scirius: #we need to wait for scirius to populate the static files
+                condition: service_healthy
+        ports:
+            - 443:443
+        networks:
+            network:

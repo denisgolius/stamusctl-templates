@@ -1,0 +1,59 @@
+configs:
+    scirius-start-sh:
+        file: ../configs/scirius/start-scirius.sh
+
+volumes:
+    scirius-data: #for scirius data persistency
+    scirius-static: #statics files to be served by nginx
+
+services:
+    scirius:
+        image: git.stamus-networks.com:4567/devel/scirius/selks:selks-image-latest
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        healthcheck:
+            interval: 10s
+            timeout: 1s
+            retries: 5
+            start_period: 5m
+        environment:
+            - SECRET_KEY="{{.scirius.token | default (randAlphaNum 64)}}"
+            - DEBUG=${SCIRIUS_DEBUG:-False}
+            - SCIRIUS_IN_SELKS=True
+            - USE_ELASTICSEARCH=True
+            - ELASTICSEARCH_ADDRESS=elasticsearch:9200 #Default
+            - USE_KIBANA=True
+            - KIBANA_URL=http://kibana:5601 #Default
+            - KIBANA_PROXY=True #Get kibana proxied by Scirius
+            - ALLOWED_HOSTS=* #allow connexions from anywhere
+            - KIBANA7_DASHBOARDS_PATH=/opt/selks/kibana7-dashboards #where to find kibana dashboards
+            - SURICATA_UNIX_SOCKET=/var/run/suricata/suricata-command.socket #socket to control suricata
+            - USE_EVEBOX=True #gives access to evebox in the top menu
+            - EVEBOX_ADDRESS=evebox:5636 #Default
+            - USE_SURICATA_STATS=True #display more informations on the suricata page
+            - USE_MOLOCH=True
+            - MOLOCH_URL=http://arkime:8005
+            - DATABASE_TYPE=pg
+            - DATABASE_NAME=selks
+            - DATABASE_USERNAME=selks
+            - DATABASE_PASSWORD=selks
+            - DATABASE_HOST=db
+            - DATABASE_PORT=5432
+        configs:
+            - source: scirius-start-sh
+              target: /opt/scirius/docker/scirius/bin/start-scirius.sh
+        volumes:
+            - scirius-static:/static/
+            - scirius-data:/data/
+            - ../containers-data/scirius/logs/:/logs/
+            - suricata-rules:/rules
+            - suricata-run:/var/run/suricata
+            - ../containers-data/suricata/logs:/var/log/suricata:ro
+        networks:
+            network:
+        depends_on:
+            db:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_healthy
+            kibana:
+                condition: service_healthy

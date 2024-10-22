@@ -1,0 +1,67 @@
+configs:
+    cron-jobs-scirius-update-suri-rules:
+        file: ../configs/cron-jobs/scirius-update-suri-rules.sh
+    cron-jobs-suricata-logrotate:
+        file: ../configs/cron-jobs/suricata-logrotate.sh
+
+volumes:
+    arkime-logs:
+    arkime-pcap:
+    arkime-config:
+
+services:
+    evebox:
+        image: jasonish/evebox:main
+        command: ['-e', 'http://elasticsearch:9200']
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        environment:
+            - EVEBOX_HTTP_TLS_ENABLED=false
+            - EVEBOX_AUTHENTICATION_REQUIRED=false
+        networks:
+            network:
+
+    cron:
+        # This containers handles crontabs for the other containers, following the 1 task per container principle.
+        # It is based on  `docker:latest` image, wich is an alpine image with docker binary
+        image: docker:27-cli
+        healthcheck:
+            test: ['CMD', 'ps', '|', 'grep', 'crond']
+            interval: 1m
+            timeout: 1m
+            retries: 3
+        command:
+            [
+                sh,
+                -c,
+                "echo '*	*	 *	*	 *	run-parts /etc/periodic/1min' >> /etc/crontabs/root && crond -f -l 8",
+            ]
+        configs:
+            - source: cron-jobs-scirius-update-suri-rules
+              target: /etc/periodic/daily/scirius-update-suri-rules.sh
+            - source: cron-jobs-suricata-logrotate
+              target: /etc/periodic/daily/suricata-logrotate.sh
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+
+    arkime:
+        build:
+            context: Arkime
+            dockerfile: Dockerfile.arkime
+        restart: ${RESTART_MODE:-no}
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://scirius:8000/moloch']
+            interval: 15s
+            timeout: 5s
+            retries: 3
+        volumes:
+            - ../containers-data/suricata/logs:/suricata-logs:ro
+            - ../containers-data/arkime/logs:/opt/arkime/logs
+            - arkime-pcap:/opt/arkime/raw
+        ports:
+            - 8005:8005
+        networks:
+            network:

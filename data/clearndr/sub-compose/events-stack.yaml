@@ -1,0 +1,82 @@
+configs:
+    fluentd-config:
+        file: ../configs/fluentd/fluent.conf
+    fluentd-template:
+        file: ../configs/fluentd/template.json
+    opensearch-config:
+        file: ../configs/opensearch/opensearch.yml
+    opensearch-dashboard-config:
+        file: ../configs/opensearch_dashboards/opensearch_dashboards.yml
+
+volumes:
+    elastic-data: #for ES data persistency
+    fluentd-pos:
+
+services:
+    elasticsearch:
+        image: opensearchproject/opensearch:1.3.19
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        healthcheck:
+            test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
+        environment:
+            - plugins.security.disabled=true
+            - discovery.type=single-node
+        volumes:
+            - ${ELASTIC_DATAPATH:-elastic-data}:/usr/share/opensearch/data
+        ports:
+            - 9200:9200
+        mem_limit: ${ELASTIC_MEMORY:-3G}
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        networks:
+            network:
+
+    kibana:
+        build:
+            context: opensearch-dashboard
+            dockerfile: Dockerfile
+        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        configs:
+            - source: opensearch-config
+              target: /usr/share/opensearch-dashboards/config/opensearch.yml
+            - source: opensearch-dashboard-config
+              target: /usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+        environment:
+            - plugins.security.disabled=true
+            - discovery.type=single-node
+            - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+        healthcheck:
+            test: ['CMD-SHELL', 'curl --silent --fail localhost:5601 || exit 1']
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+        ports:
+            - 5601:5601
+        networks:
+            network:
+
+    fluentd:
+        build:
+            context: ../fluentd
+            dockerfile: Dockerfile
+        command: fluentd -c /fluentd/etc/fluent.conf -v
+        configs:
+            - source: fluentd-config
+              target: /fluentd/etc/fluent.conf
+            - source: fluentd-template
+              target: /fluentd/etc/template.json
+        volumes:
+            - fluentd-pos:/fluentd/log/td-agent
+            - ../containers-data/suricata/logs:/var/log/suricata:ro
+        networks:
+            network:
