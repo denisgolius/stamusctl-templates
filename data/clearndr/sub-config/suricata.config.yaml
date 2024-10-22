@@ -1,0 +1,6 @@
+suricata:
+  pcapReplay:
+    hostPath:
+      type: string
+      usage: Path on the host where you will put the pcap to be replayed
+      default: ../containers-data/suricata/replay
