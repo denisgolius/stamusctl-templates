@@ -64,7 +64,7 @@ volumes:
 
 services:
     elasticsearch:
-        image: opensearchproject/opensearch:1
+        image: opensearchproject/opensearch:1.3.19
         restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
@@ -204,7 +204,7 @@ services:
             kibana:
                 condition: service_healthy
     evebox:
-        image: jasonish/evebox:master
+        image: jasonish/evebox:main
         command: ['-e', 'http://elasticsearch:9200']
         restart: {{ .globals.restartmode | default "unless-stopped" }}
         environment:
@@ -215,7 +215,7 @@ services:
 
 
     ssl-keygen:
-        image: nginx
+        image: nginx:1.27
         command: ['/bin/bash', '-c', 'openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca']
         restart: on-failure
         volumes:
@@ -226,7 +226,7 @@ services:
             network:
 
     nginx:
-        image: nginx
+        image: nginx:1.27
         command: ['${NGINX_EXEC:-nginx}', '-g', 'daemon off;']
         configs:
             - source: nginx-config
@@ -255,7 +255,7 @@ services:
     cron:
         # This containers handles crontabs for the other containers, following the 1 task per container principle.
         # It is based on  `docker:latest` image, wich is an alpine image with docker binary
-        image: docker:latest
+        image: docker:27-cli
         healthcheck:
             test: ['CMD', 'ps', '|', 'grep', 'crond']
             interval: 1m
@@ -299,7 +299,7 @@ services:
             network:
 
     db:
-        image: postgres
+        image: postgres:17
         restart: always
         shm_size: 128mb
         environment:
