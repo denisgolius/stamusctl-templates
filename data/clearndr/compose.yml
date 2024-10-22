@@ -60,10 +60,10 @@ volumes:
     arkime-config:
     db-data:
     fluentd-pos:
+    nginx-ssl:
 
 services:
     elasticsearch:
-        container_name: elasticsearch
         image: opensearchproject/opensearch:1
         restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
@@ -88,7 +88,6 @@ services:
             network:
 
     kibana:
-        container_name: kibana
         build:
             context: opensearch-dashboard
             dockerfile: Dockerfile
@@ -117,7 +116,6 @@ services:
             network:
 
     fluentd:
-        container_name: fluentd
         build:
             context: ./fluentd
             dockerfile: Dockerfile
@@ -134,7 +132,6 @@ services:
             network:
 
     suricata:
-        container_name: suricata
         image: jasonish/suricata:master-amd64
         entrypoint: /new_entrypoint.sh
         restart: {{ .globals.restartmode | default "unless-stopped" }}
@@ -157,7 +154,6 @@ services:
             - ./containers-data/suricata/logrotate:/etc/logrotate.d/
 
     scirius:
-        container_name: scirius
         image: git.stamus-networks.com:4567/devel/scirius/selks:selks-image-latest
         restart: {{ .globals.restartmode | default "unless-stopped" }}
         healthcheck:
@@ -208,7 +204,6 @@ services:
             kibana:
                 condition: service_healthy
     evebox:
-        container_name: evebox
         image: jasonish/evebox:master
         command: ['-e', 'http://elasticsearch:9200']
         restart: {{ .globals.restartmode | default "unless-stopped" }}
@@ -218,8 +213,19 @@ services:
         networks:
             network:
 
+
+    ssl-keygen:
+        image: nginx
+        command: ['/bin/bash', '-c', 'openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca']
+        restart: on-failure
+        volumes:
+            - nginx-ssl:/etc/nginx/ssl
+        ports:
+            - 443:443
+        networks:
+            network:
+
     nginx:
-        container_name: nginx
         image: nginx
         command: ['${NGINX_EXEC:-nginx}', '-g', 'daemon off;']
         configs:
@@ -233,13 +239,14 @@ services:
             interval: 10s
             timeout: 2s
             retries: 5
-        depends_on:
-            scirius: #we need to wait for scirius to populate the static files
-                condition: service_healthy
         volumes:
             - scirius-static:/static/:ro
-            - ./configs/nginx/ssl:/etc/nginx/ssl:ro
-
+            - nginx-ssl:/etc/nginx/ssl:ro
+        depends_on:
+            ssl-keygen:
+                condition: service_completed_successfully
+            scirius: #we need to wait for scirius to populate the static files
+                condition: service_healthy
         ports:
             - 443:443
         networks:
@@ -248,7 +255,6 @@ services:
     cron:
         # This containers handles crontabs for the other containers, following the 1 task per container principle.
         # It is based on  `docker:latest` image, wich is an alpine image with docker binary
-        container_name: cron
         image: docker:latest
         healthcheck:
             test: ['CMD', 'ps', '|', 'grep', 'crond']
@@ -271,7 +277,6 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
 
     arkime:
-        container_name: arkime
         build:
             context: Arkime
             dockerfile: Dockerfile.arkime
@@ -294,7 +299,6 @@ services:
             network:
 
     db:
-        container_name: db
         image: postgres
         restart: always
         shm_size: 128mb
