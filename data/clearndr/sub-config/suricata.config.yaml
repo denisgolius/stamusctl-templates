@@ -4,3 +4,20 @@ suricata:
       type: string
       usage: Path on the host where you will put the pcap to be replayed
       default: ../containers-data/suricata/replay
+  interfaces:
+    type: string
+    usage: List of interfaces to monitor
+    choices: interfaces
+  logs:
+    file:
+      type: optional
+      usage: Enable Suricata logs ?
+      default: true
+      hostPath:
+        type: string
+        usage: Path where Suricata logs will be stored
+        default: suricata-logs
+      internalPath:
+        type: string
+        usage: Path where Suricata logs will be stored inside the container
+        default: /var/log/suricata
