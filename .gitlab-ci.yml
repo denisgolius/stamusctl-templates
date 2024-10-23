@@ -1,5 +1,6 @@
 stages:
     - docker
+    - release
 
 default:
   tags:
@@ -47,3 +48,19 @@ clearndr:
             -t "${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}"
         - docker push ${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_SHORT_SHA}
         - docker push ${CI_REGISTRY_IMAGE}/clearndr:${CI_COMMIT_BRANCH}
+
+release-to-github:
+    stage: release
+    image: bitnami/git
+    rules:
+    - if: '$CI_COMMIT_BRANCH == "latest"'
+      when: on_success
+    script:
+        - git config --global user.email $GITLAB_USER_EMAIL
+        - git config --global user.name $GITLAB_USER_NAME
+        - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl-templates.git"
+        - git fetch github
+        - git checkout -b github-next
+        - git branch --set-upstream-to github/next
+        - git pull --rebase
+        - git push github HEAD:next
