@@ -27,7 +27,7 @@ services:
               target: /etc/nginx/nginx.conf
             - source: nginx-selks-config
               target: /etc/nginx/conf.d/selks6.conf
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD', 'service', 'nginx', 'status']
             interval: 10s

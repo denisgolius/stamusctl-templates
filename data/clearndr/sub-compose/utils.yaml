@@ -13,7 +13,7 @@ services:
     evebox:
         image: jasonish/evebox:main
         command: ['-e', 'http://elasticsearch:9200']
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         environment:
             - EVEBOX_HTTP_TLS_ENABLED=false
             - EVEBOX_AUTHENTICATION_REQUIRED=false
@@ -40,7 +40,7 @@ services:
               target: /etc/periodic/daily/scirius-update-suri-rules.sh
             - source: cron-jobs-suricata-logrotate
               target: /etc/periodic/daily/suricata-logrotate.sh
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
 

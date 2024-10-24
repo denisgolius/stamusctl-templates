@@ -18,7 +18,7 @@ services:
     suricata:
         image: jasonish/suricata:master-amd64
         entrypoint: /new_entrypoint.sh
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
             - source: suricata-new-entrypoint
               target: /new_entrypoint.sh
@@ -43,7 +43,7 @@ services:
         command: ['chown -R 1000:1000 /replay']
         restart: on-failure
         volumes:
-            - {{.suricata.pcapReplay.hostPath | default "../containers-data/suricata/replay"}}:/replay
+            - {{ .Release.location | default ".." }}/{{.Values.suricata.pcapreplay.hostpath | default "containers-data/suricata/replay"}}:/replay
 
     read-pcap:
         image: jasonish/suricata:master-amd64-profiling
@@ -60,7 +60,7 @@ services:
             - suricata-rules:/etc/suricata/rules
             - suricata-run:/var/run/suricata/
             - ../containers-data/suricata/etc:/etc/suricata
-            - {{.suricata.pcapReplay.hostPath | default "../containers-data/suricata/replay"}}:/replay
+            - {{ .Release.location | default ".." }}/{{.Values.suricata.pcapreplay.hostpath | default "containers-data/suricata/replay"}}:/replay
         cap_add:
             - NET_ADMIN
             - SYS_NICE

@@ -9,7 +9,7 @@ volumes:
 services:
     scirius:
         image: git.stamus-networks.com:4567/devel/scirius/selks:selks-image-latest
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s
             timeout: 1s

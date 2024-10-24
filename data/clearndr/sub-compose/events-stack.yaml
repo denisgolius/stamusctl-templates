@@ -15,7 +15,7 @@ volumes:
 services:
     elasticsearch:
         image: opensearchproject/opensearch:1.3.19
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
             interval: 10s
@@ -41,7 +41,7 @@ services:
         build:
             context: opensearch-dashboard
             dockerfile: Dockerfile
-        restart: {{ .globals.restartmode | default "unless-stopped" }}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
             - source: opensearch-config
               target: /usr/share/opensearch-dashboards/config/opensearch.yml
