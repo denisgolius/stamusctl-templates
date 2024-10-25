@@ -1,10 +1,38 @@
 stages:
+    - tests
     - docker
     - release
 
 default:
   tags:
     - k8s-small
+
+test clearndr:
+    stage: tests
+    image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:main
+    tags:
+      - k8s
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    script:
+        - apk update && apk add jq
+        - stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - docker login $CI_REGISTRY --username $GITLAB_REGISTRY_USER --password $GITLAB_REGISTRY_TOKEN
+        - stamusctl compose init --default --template data/clearndr/
+        - stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
+        - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.Status == "exited"'
+        - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.Status == "exited"'
+        - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.ExitCode == 0'
+        - stamusctl compose down
+        - stamusctl config set globals.restartmode=always
+        - stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
 
 tests:
     stage: docker
@@ -38,6 +66,8 @@ clearndr:
         DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
     services:
         - docker:24.0.5-dind
+    needs:
+        - test clearndr
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build
