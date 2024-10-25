@@ -46,7 +46,7 @@ services:
 
     arkime:
         build:
-            context: Arkime
+            context: ../Arkime
             dockerfile: Dockerfile.arkime
         restart: ${RESTART_MODE:-no}
         depends_on:

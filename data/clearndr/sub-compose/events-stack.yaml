@@ -39,7 +39,7 @@ services:
 
     kibana:
         build:
-            context: opensearch-dashboard
+            context: ../opensearch-dashboard
             dockerfile: Dockerfile
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
