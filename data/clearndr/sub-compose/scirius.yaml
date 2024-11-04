@@ -46,6 +46,7 @@ services:
             - scirius-data:/data/
             - ../containers-data/scirius/logs/:/logs/
             - suricata-rules:/rules
+            - ../containers-data/suricata/rules:/rules
             - suricata-run:/var/run/suricata
             - ../containers-data/suricata/logs:/var/log/suricata:ro
         networks:
