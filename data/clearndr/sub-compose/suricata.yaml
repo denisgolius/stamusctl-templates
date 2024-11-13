@@ -25,7 +25,7 @@ services:
             - source: suricata-selks6-addin
               target: /etc/suricata-configs/selks6-addin.yaml
         environment:
-            - SURICATA_OPTIONS= -i {{.suricata.interfaces | default "dummy0"}} -vvv --set sensor-name=suricata
+            - SURICATA_OPTIONS= -i {{.Values.suricata.interfaces | default "dummy0"}} -vvv --set sensor-name=suricata
         cap_add:
             - NET_ADMIN
             - SYS_NICE
