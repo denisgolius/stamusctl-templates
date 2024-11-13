@@ -8,7 +8,7 @@ volumes:
 
 services:
     scirius:
-        image: git.stamus-networks.com:4567/devel/scirius/selks:selks-image-latest
+        image: ghcr.io/stamusnetworks/scirius:clearndr-ce-b1
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s
