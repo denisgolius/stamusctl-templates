@@ -16,7 +16,7 @@ volumes:
 
 services:
     suricata:
-        image: jasonish/suricata:master-amd64
+        image: jasonish/suricata:7.0
         entrypoint: /new_entrypoint.sh
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
