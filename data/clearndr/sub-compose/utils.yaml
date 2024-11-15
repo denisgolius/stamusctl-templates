@@ -65,3 +65,14 @@ services:
             - 8005:8005
         networks:
             network:
+
+    ownership-fix:
+        image: busybox
+        entrypoint: /bin/sh -c
+        command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data']
+        restart: on-failure
+        volumes:
+            - {{ .Release.location | default ".." }}/containers-data:/containers-data
+        depends_on:
+            - scirius
+            - suricata
