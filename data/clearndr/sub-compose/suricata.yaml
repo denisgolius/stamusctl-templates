@@ -35,6 +35,7 @@ services:
             - ../containers-data/suricata/logs:/var/log/suricata
             - ../containers-data/suricata/rules:/etc/suricata/rules
             - ../containers-data/suricata/etc:/etc/suricata
+            - ../fpc:/var/log/suricata/fpc
             - ../containers-data/suricata/logrotate:/etc/logrotate.d/
         depends_on:
             scirius:
