@@ -4,7 +4,7 @@ volumes:
 services:
     db:
         image: postgres:17
-        container_name: {{template "base-name" .}}-db-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-db-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         shm_size: 128mb
         environment:

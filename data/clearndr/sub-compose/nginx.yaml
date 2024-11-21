@@ -10,7 +10,7 @@ volumes:
 services:
     ssl-keygen:
         image: nginx:1.27
-        container_name: {{template "base-name" .}}-ssl-keygen-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-ssl-keygen-{{template "suffix-name" .}}
         command: ['/bin/bash', '-c', 'openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca']
         restart: on-failure
         volumes:
@@ -22,7 +22,7 @@ services:
 
     nginx:
         image: nginx:1.27
-        container_name: {{template "base-name" .}}-nginx-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-nginx-{{template "suffix-name" .}}
         command: ['${NGINX_EXEC:-nginx}', '-g', 'daemon off;']
         configs:
             - source: nginx-config

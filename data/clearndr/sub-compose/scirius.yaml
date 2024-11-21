@@ -9,7 +9,7 @@ volumes:
 services:
     scirius:
         image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
-        container_name: {{template "base-name" .}}-scirius-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-scirius-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s

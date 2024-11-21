@@ -15,7 +15,7 @@ volumes:
 services:
     elasticsearch:
         image: opensearchproject/opensearch:1.3.19
-        container_name: {{template "base-name" .}}-opensearch-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-opensearch-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
@@ -44,7 +44,7 @@ services:
         build:
             context: ../opensearch-dashboard
             dockerfile: Dockerfile
-        container_name: {{template "base-name" .}}-opensearch-dashboards-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-opensearch-dashboards-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
             - source: opensearch-config
@@ -75,7 +75,7 @@ services:
         build:
             context: ../fluentd
             dockerfile: Dockerfile
-        container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name" .}}
         command: fluentd -c /fluentd/etc/fluent.conf -v
         configs:
             - source: fluentd-config

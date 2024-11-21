@@ -13,7 +13,7 @@ volumes:
 services:
     suricata:
         image: jasonish/suricata:7.0
-        container_name: {{template "base-name" .}}-suricata-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-suricata-{{template "suffix-name" .}}
         entrypoint: /new_entrypoint.sh
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:

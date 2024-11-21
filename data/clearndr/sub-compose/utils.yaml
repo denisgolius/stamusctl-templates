@@ -13,7 +13,7 @@ services:
     {{- if .Values.evebox }}
     evebox:
         image: jasonish/evebox:{{ (.Values.evebox).version | default "master" }}
-        container_name: {{template "base-name" .}}-evebox-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-evebox-{{template "suffix-name" .}}
         command: ['-e', 'http://elasticsearch:9200']
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         environment:
@@ -24,7 +24,7 @@ services:
     {{- end }}
     cron:
         image: docker:27-cli
-        container_name: {{template "base-name" .}}-cron-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-cron-{{template "suffix-name" .}}
         healthcheck:
             test: ['CMD', 'ps', '|', 'grep', 'crond']
             interval: 1m
@@ -50,7 +50,7 @@ services:
         build:
             context: ../Arkime
             dockerfile: Dockerfile.arkime
-        container_name: {{template "base-name" .}}-arkime-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-arkime-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:
             elasticsearch:
@@ -74,7 +74,7 @@ services:
 
     ownership-fix:
         image: busybox
-        container_name: {{template "base-name" .}}-ownership-fix-{{template "suffix-name"}}
+        container_name: {{template "base-name" .}}-ownership-fix-{{template "suffix-name" .}}
         entrypoint: /bin/sh -c
         command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data']
         restart: on-failure
