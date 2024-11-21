@@ -94,10 +94,6 @@ release-to-github:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
         - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl-templates.git"
-        - git fetch github
-        - git checkout -b github-next
-        - git branch --set-upstream-to github/next
-        - git pull --rebase
         - git push github HEAD:next
 
 
