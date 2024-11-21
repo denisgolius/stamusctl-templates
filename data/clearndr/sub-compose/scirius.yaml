@@ -8,7 +8,8 @@ volumes:
 
 services:
     scirius:
-        image: ghcr.io/stamusnetworks/scirius:clearndr-ce-b1
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        container_name: {{template "base-name" .}}-scirius-{{template "suffix-name"}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s
@@ -17,7 +18,7 @@ services:
             start_period: 5m
         environment:
             - SECRET_KEY="{{.scirius.token | default (randAlphaNum 64)}}"
-            - DEBUG=${SCIRIUS_DEBUG:-False}
+            - DEBUG={{.Values.scirius.debug | default "False"}}
             - SCIRIUS_IN_SELKS=True
             - USE_ELASTICSEARCH=True
             - ELASTICSEARCH_ADDRESS=elasticsearch:9200 #Default
@@ -27,11 +28,15 @@ services:
             - ALLOWED_HOSTS=* #allow connexions from anywhere
             - KIBANA7_DASHBOARDS_PATH=/opt/selks/kibana7-dashboards #where to find kibana dashboards
             - SURICATA_UNIX_SOCKET=/var/run/suricata/suricata-command.socket #socket to control suricata
+            {{- if .Values.evebox }}
             - USE_EVEBOX=True #gives access to evebox in the top menu
             - EVEBOX_ADDRESS=evebox:5636 #Default
+            {{- end }}
             - USE_SURICATA_STATS=True #display more informations on the suricata page
+            {{- if .Values.arkime }}
             - USE_MOLOCH=True
             - MOLOCH_URL=http://arkime:8005
+            {{- end }}
             - DATABASE_TYPE=pg
             - DATABASE_NAME=selks
             - DATABASE_USERNAME=selks
@@ -44,11 +49,15 @@ services:
         volumes:
             - scirius-static:/static/
             - scirius-data:/data/
-            - ../containers-data/scirius/logs/:/logs/
             - suricata-rules:/rules
-            - ../containers-data/suricata/rules:/rules
             - suricata-run:/var/run/suricata
-            - ../containers-data/suricata/logs:/var/log/suricata:ro
+            - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
+            - {{ .Release.location }}/containers-data/suricata/rules:/rules
+            - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
+        {{- if or .Values.global.exposePorts .Values.scirius.openPort }}
+        ports:
+            - 8000:8000
+        {{- end }}
         networks:
             network:
         depends_on:

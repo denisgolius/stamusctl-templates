@@ -1,0 +1,18 @@
+
+arkime:
+  type: optional
+  usage: Enable Arkime Viewer instance ?
+  default: true
+  openPort:
+    type: bool
+    usage: Open port for Arkime Viewer ?
+    default: false
+
+evebox:
+  type: optional
+  usage: Enable Evebox instance ?
+  default: true
+  version:
+    type: string
+    usage: Evebox version to install
+    default: master

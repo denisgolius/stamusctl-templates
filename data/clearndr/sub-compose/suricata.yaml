@@ -8,15 +8,12 @@ volumes:
     suricata-rules: #for suricata rules transfer between scirius and suricata and for persistency
     suricata-run: #path where the suricata socket resides
     suricata-logs:
-    suricata-logrotate:
-        driver_opts:
-            type: none
-            o: bind
-            device: ../containers-data/suricata/logrotate
+    suricata-etc:
 
 services:
     suricata:
         image: jasonish/suricata:7.0
+        container_name: {{template "base-name" .}}-suricata-{{template "suffix-name"}}
         entrypoint: /new_entrypoint.sh
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
@@ -32,11 +29,11 @@ services:
         network_mode: host
         volumes:
             - suricata-run:/var/run/suricata/
-            - ../containers-data/suricata/logs:/var/log/suricata
-            - ../containers-data/suricata/rules:/etc/suricata/rules
-            - ../containers-data/suricata/etc:/etc/suricata
-            - ../fpc:/var/log/suricata/fpc
-            - ../containers-data/suricata/logrotate:/etc/logrotate.d/
+            - suricata-etc:/etc/suricata
+            - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
+            - {{ .Release.location }}/containers-data/suricata/rules:/etc/suricata/rules
+            - {{ .Release.location }}/fpc:/var/log/suricata/fpc
+            - {{ .Release.location }}/containers-data/suricata/logrotate:/etc/logrotate.d/
         depends_on:
             scirius:
                 condition: service_healthy

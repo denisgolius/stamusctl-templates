@@ -15,6 +15,7 @@ volumes:
 services:
     elasticsearch:
         image: opensearchproject/opensearch:1.3.19
+        container_name: {{template "base-name" .}}-opensearch-{{template "suffix-name"}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             test: ['CMD-SHELL', 'curl --silent --fail localhost:9200/_cluster/health || exit 1']
@@ -27,8 +28,10 @@ services:
             - discovery.type=single-node
         volumes:
             - ${ELASTIC_DATAPATH:-elastic-data}:/usr/share/opensearch/data
+        {{- if or .Values.global.exposePorts .Values.opensearch.openPort }}
         ports:
             - 9200:9200
+        {{- end }}
         mem_limit: ${ELASTIC_MEMORY:-3G}
         ulimits:
             memlock:
@@ -41,6 +44,7 @@ services:
         build:
             context: ../opensearch-dashboard
             dockerfile: Dockerfile
+        container_name: {{template "base-name" .}}-opensearch-dashboards-{{template "suffix-name"}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
             - source: opensearch-config
@@ -60,8 +64,10 @@ services:
         depends_on:
             elasticsearch:
                 condition: service_healthy
+        {{- if or .Values.global.exposePorts .Values.opensearch.dashboard.openPort }}
         ports:
             - 5601:5601
+        {{- end }}
         networks:
             network:
 
@@ -69,6 +75,7 @@ services:
         build:
             context: ../fluentd
             dockerfile: Dockerfile
+        container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name"}}
         command: fluentd -c /fluentd/etc/fluent.conf -v
         configs:
             - source: fluentd-config
@@ -77,6 +84,6 @@ services:
               target: /fluentd/etc/template.json
         volumes:
             - fluentd-pos:/fluentd/log/td-agent
-            - ../containers-data/suricata/logs:/var/log/suricata:ro
+            - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
         networks:
             network:

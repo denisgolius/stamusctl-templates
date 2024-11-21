@@ -10,8 +10,10 @@ volumes:
     arkime-config:
 
 services:
+    {{- if .Values.evebox }}
     evebox:
-        image: jasonish/evebox:main
+        image: jasonish/evebox:{{ (.Values.evebox).version | default "master" }}
+        container_name: {{template "base-name" .}}-evebox-{{template "suffix-name"}}
         command: ['-e', 'http://elasticsearch:9200']
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         environment:
@@ -19,11 +21,10 @@ services:
             - EVEBOX_AUTHENTICATION_REQUIRED=false
         networks:
             network:
-
+    {{- end }}
     cron:
-        # This containers handles crontabs for the other containers, following the 1 task per container principle.
-        # It is based on  `docker:latest` image, wich is an alpine image with docker binary
         image: docker:27-cli
+        container_name: {{template "base-name" .}}-cron-{{template "suffix-name"}}
         healthcheck:
             test: ['CMD', 'ps', '|', 'grep', 'crond']
             interval: 1m
@@ -44,11 +45,13 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
 
+    {{- if .Values.arkime }}
     arkime:
         build:
             context: ../Arkime
             dockerfile: Dockerfile.arkime
-        restart: ${RESTART_MODE:-no}
+        container_name: {{template "base-name" .}}-arkime-{{template "suffix-name"}}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:
             elasticsearch:
                 condition: service_healthy
@@ -58,16 +61,20 @@ services:
             timeout: 5s
             retries: 3
         volumes:
-            - ../containers-data/suricata/logs:/suricata-logs:ro
-            - ../containers-data/arkime/logs:/opt/arkime/logs
+            - {{ .Release.location }}/containers-data/suricata/logs:/suricata-logs:ro
+            - {{ .Release.location }}/containers-data/arkime/logs:/opt/arkime/logs
             - arkime-pcap:/opt/arkime/raw
+        {{- if or .Values.global.exposePorts .Values.arkime.openPort }}
         ports:
             - 8005:8005
+        {{- end }}
         networks:
             network:
+    {{- end }}
 
     ownership-fix:
         image: busybox
+        container_name: {{template "base-name" .}}-ownership-fix-{{template "suffix-name"}}
         entrypoint: /bin/sh -c
         command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data']
         restart: on-failure

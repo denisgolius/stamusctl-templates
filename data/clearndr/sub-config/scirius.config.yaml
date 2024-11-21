@@ -1,0 +1,16 @@
+scirius:
+  type: optional
+  usage: Enable Scirius instance ?
+  default: true
+  registry:
+    type: string
+    usage: Image registry where to find scirius image
+    default: ghcr.io/stamusnetworks/scirius
+  version:
+    type: string
+    usage: Scirius version to install
+    default: clearndr-ce-b1
+  debug:
+    type: bool
+    usage: Enable debug mode
+    default: false

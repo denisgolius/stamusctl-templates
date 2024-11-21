@@ -4,11 +4,21 @@
 
 #### Overview
 
-TODO
+This template is used to deploy ClearNDR CE.
 
 #### Values
 
-TODO
+| Config    | description | default |
+| -------- | ------- | ------- |
+| .globals.restartmode | restart mode of all services    | "unless-stopped" |
+| .opensearch.openPort | Open port of opensearch to local network | false |
+| .opensearch.openPort.dashboards.openPort | Open port of opensearch-dashboards to local network | false |
+| .scirius.registry | Image registry where to find scirius image | "ghcr.io/stamusnetworks/scirius" |
+| .scirius.version | Scirius version to install | clearndr-ce-b1 |
+| .scirius.debug | Enable debug mode | false |
+| .suricata.interfaces | List of interfaces to monitor | "..."(all network interfaces on host) |
+| .arkime.openPort | Open port of Arkime Viewer | false |
+| .evebox.version | Evebox version to install | master |
 
 ## Top level variables in templates
 

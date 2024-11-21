@@ -1,67 +1,12 @@
 includes:
+  ./sub-config/opensearch.config.yaml
   ./sub-config/suricata.config.yaml
+  ./sub-config/scirius.config.yaml
+  ./sub-config/utils.config.yaml
 
 globals:
   restartmode:
     type: string
-    usage: Restart mode for services
+    usage: Restart mode for all services
     default: unless-stopped
     choices: restart
-  volumepath:
-    type: string
-    usage: Path where data will be stored
-    default: "."
-
-registry:
-  type: string
-  usage: Docker registry to use
-  default: ghcr.io/stamusnetworks
-
-scirius:
-  type: optional
-  usage: Enable Scirius instance ?
-  default: true
-  version:
-    type: string
-    usage: Scirius version to install
-    default: selks
-  debug:
-    type: bool
-    usage: Enable debug mode
-    default: false
-
-arkimeviewer:
-  type: optional
-  usage: Enable Arkime Viewer instance ?
-  default: false
-  version:
-    type: string
-    usage: Arkime version to install
-    default: master
-
-evebox:
-  type: optional
-  usage: Enable Evebox instance ?
-  default: false
-  version:
-    type: string
-    usage: Evebox version to install
-    default: master
-
-db:
-  type: optional
-  usage: Enable internal database ?
-  default: true
-  host:
-    type: string
-    usage: Database host
-    default: db
-
-dbExternal:
-  type: optional
-  usage: Enable external database ?
-  default: false
-  host:
-    type: string
-    usage: Database host
-    default: localhost
