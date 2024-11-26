@@ -14,3 +14,23 @@ scirius:
     type: bool
     usage: Enable debug mode
     default: false
+  celery:
+    type: optional
+    usage: Enable Celery ?
+    default: true
+    flower:
+      type: optional
+      usage: Enable Celery flower ?
+      default: false
+    worker:
+      type: optional
+      usage: Enable Celery worker ?
+      default: true
+      restart:
+        type: string
+        usage: Celery worker restart mode
+        default: unless-stopped
+    test:
+      type: optional
+      usage: Enable Celery flower ?
+      default: false

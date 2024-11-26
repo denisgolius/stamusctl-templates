@@ -1,5 +1,5 @@
 opensearch:
-  openPort:
+  openport:
     type: bool
     usage: Expose OpenSearch port
     default: false
@@ -7,7 +7,7 @@ opensearch:
     type: optional
     usage: Enable OpenSearch Dashboards
     default: true
-    openPort:
+    openport:
       type: bool
       usage: Expose OpenSearch Dashboards port
       default: true

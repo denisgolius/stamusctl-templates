@@ -3,7 +3,7 @@ arkime:
   type: optional
   usage: Enable Arkime Viewer instance ?
   default: true
-  openPort:
+  openport:
     type: bool
     usage: Open port for Arkime Viewer ?
     default: false

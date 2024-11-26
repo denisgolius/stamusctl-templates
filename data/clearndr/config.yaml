@@ -1,4 +1,5 @@
 includes:
+  ./sub-config/db.config.yaml
   ./sub-config/opensearch.config.yaml
   ./sub-config/suricata.config.yaml
   ./sub-config/scirius.config.yaml

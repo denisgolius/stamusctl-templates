@@ -1,0 +1,8 @@
+rabbitmq:
+  type: optional
+  usage: Enable RabbitMQ
+  default: true
+  openport:
+    type: bool
+    usage: Expose RabbitMQ port
+    default: false
