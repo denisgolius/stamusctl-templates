@@ -31,6 +31,7 @@ services:
             - suricata-run:/var/run/suricata/
             - suricata-etc:/etc/suricata
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
+            - {{ .Release.location }}/containers-data/suricata/etc:/etc/suricata
             - {{ .Release.location }}/containers-data/suricata/rules:/etc/suricata/rules
             - {{ .Release.location }}/fpc:/var/log/suricata/fpc
             - {{ .Release.location }}/containers-data/suricata/logrotate:/etc/logrotate.d/
