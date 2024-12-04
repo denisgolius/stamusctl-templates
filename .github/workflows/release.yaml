@@ -1,0 +1,31 @@
+name: Create release and tag
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    create-tag:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: get tag version
+              id: get_tag_version
+              run: |
+                  cat version.txt
+                  echo "version=$(cat version.txt)" >> $GITHUB_OUTPUT
+
+            - name: test
+              run: |
+                  echo ${{ steps.get_tag_version.outputs.version }}
+
+            - name: Release snapshot
+              id: release-snapshot
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.get_tag_version.outputs.version }}
+                  draft: false
+                  prerelease: false
