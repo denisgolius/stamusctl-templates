@@ -109,6 +109,43 @@ services:
                 condition: service_healthy
     {{- end }}
 
+    {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.beat }}
+    celery-beat:
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        container_name: {{template "base-name" .}}-celery-beat-{{template "suffix-name" .}}
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
+        working_dir: /opt/scirius
+        entrypoint: celery
+        command: -A suricata beat --loglevel=info
+        environment:
+            - SECRET_KEY="{{.scirius.token | default (randAlphaNum 64)}}"
+            - DATABASE_TYPE=postgres
+            - DATABASE_NAME=selks
+            - DATABASE_USERNAME=selks
+            - DATABASE_PASSWORD=selks
+            - DATABASE_HOST=db
+            - DATABASE_PORT=5432
+        volumes:
+            - scirius-data:/data/
+            - suricata-etc:/etc/suricata
+            - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
+            - {{ .Release.location }}/containers-data/suricata/rules:/rules
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'celery --broker=amqp://guest:guest@rabbitmq:5672// -A suricata inspect ping',
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        networks:
+            network:
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+    {{- end }}
+
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.flower }}
     celery-flower:
         image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}

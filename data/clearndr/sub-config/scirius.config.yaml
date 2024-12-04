@@ -30,6 +30,14 @@ scirius:
         type: string
         usage: Celery worker restart mode
         default: unless-stopped
+    beat:
+      type: optional
+      usage: Enable Celery beat ?
+      default: true
+      restart:
+        type: string
+        usage: Celery beat restart mode
+        default: unless-stopped
     test:
       type: optional
       usage: Enable Celery flower ?
