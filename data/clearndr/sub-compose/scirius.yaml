@@ -52,8 +52,8 @@ services:
         volumes:
             - scirius-static:/static/
             - scirius-data:/data/
-            - suricata-rules:/rules
             - suricata-run:/var/run/suricata
+            - suricata-etc:/etc/suricata
             - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
             - {{ .Release.location }}/containers-data/suricata/rules:/rules
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
@@ -89,8 +89,10 @@ services:
             - DATABASE_HOST=db
             - DATABASE_PORT=5432
         volumes:
-            - celery-git-path:/data/git-sources/1/rules
-            - ./docker/containers-data/scirius/logs/:/logs/
+            - scirius-data:/data/
+            - suricata-etc:/etc/suricata
+            - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
+            - {{ .Release.location }}/containers-data/suricata/rules:/rules
         healthcheck:
             test:
                 [

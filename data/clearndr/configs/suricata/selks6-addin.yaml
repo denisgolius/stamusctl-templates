@@ -2,7 +2,7 @@
 ---
 
 # Suricata configuration file SELKS addition.
-# This file is added to /etc/suricata/suricata.yaml and overrides 
+# This file is added to /etc/suricata/suricata.yaml and overrides
 # specific settings
 
 # IP Reputation
@@ -791,7 +791,7 @@ app-layer:
       # For best performance, select 'bypass'.
       #
       #encrypt-handling: default
-      
+
     dcerpc:
       enabled: yes
     ftp:
@@ -1025,3 +1025,7 @@ app-layer:
 
 # Limit for the maximum number of asn1 frames to decode (default 256)
 asn1-max-frames: 256
+
+unix-command:
+  enabled: yes
+  filename: /var/run/suricata/suricata-command.socket

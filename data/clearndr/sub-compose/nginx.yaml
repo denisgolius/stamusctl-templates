@@ -15,8 +15,6 @@ services:
         restart: on-failure
         volumes:
             - nginx-ssl:/etc/nginx/ssl
-        ports:
-            - 443:443
         networks:
             network:
 
