@@ -5,6 +5,7 @@ configs:
 volumes:
     scirius-data: #for scirius data persistency
     scirius-static: #statics files to be served by nginx
+    celery-git-path:
 
 services:
 
@@ -84,10 +85,11 @@ services:
             - DATABASE_TYPE=postgres
             - DATABASE_NAME=selks
             - DATABASE_USERNAME=selks
-            - DATABASE_PASSWORD=example
+            - DATABASE_PASSWORD=selks
             - DATABASE_HOST=db
             - DATABASE_PORT=5432
         volumes:
+            - celery-git-path:/data/git-sources/1/rules
             - ./docker/containers-data/scirius/logs/:/logs/
         healthcheck:
             test:
