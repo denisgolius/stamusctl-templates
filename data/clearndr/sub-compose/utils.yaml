@@ -76,7 +76,7 @@ services:
         image: busybox
         container_name: {{template "base-name" .}}-ownership-fix-{{template "suffix-name" .}}
         entrypoint: /bin/sh -c
-        command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data']
+        command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data/scirius && chown -R {{.Release.user}}:{{.Release.group}} /containers-data/arkime']
         restart: on-failure
         volumes:
             - {{ .Release.location | default ".." }}/containers-data:/containers-data
