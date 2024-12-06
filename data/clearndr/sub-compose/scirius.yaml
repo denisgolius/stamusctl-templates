@@ -11,7 +11,7 @@ services:
 
     {{- if .Values.scirius }}
     scirius:
-        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clear-ndr-b2" }}
         container_name: {{template "base-name" .}}-scirius-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
@@ -74,7 +74,7 @@ services:
 
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.worker }}
     celery-worker:
-        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clear-ndr-b2" }}
         container_name: {{template "base-name" .}}-celery-worker-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         working_dir: /opt/scirius
@@ -111,7 +111,7 @@ services:
 
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.beat }}
     celery-beat:
-        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clear-ndr-b2" }}
         container_name: {{template "base-name" .}}-celery-beat-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         working_dir: /opt/scirius
@@ -148,7 +148,7 @@ services:
 
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.flower }}
     celery-flower:
-        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clearndr-ce-b1" }}
+        image: {{ .Values.scirius.registry | default "ghcr.io/stamusnetworks/scirius" }}:{{ .Values.scirius.version | default "clear-ndr-b2" }}
         container_name: {{template "base-name" .}}-celery-flower-{{template "suffix-name" .}}
         restart: always
         command: celery --broker=amqp://guest:guest@rabbitmq:5672// flower -A suricata

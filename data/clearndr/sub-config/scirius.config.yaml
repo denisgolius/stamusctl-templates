@@ -9,7 +9,7 @@ scirius:
   version:
     type: string
     usage: Scirius version to install
-    default: clearndr-ce-b1
+    default: clear-ndr-b2
   debug:
     type: bool
     usage: Enable debug mode
