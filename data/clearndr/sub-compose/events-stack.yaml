@@ -76,7 +76,7 @@ services:
             context: ../fluentd
             dockerfile: Dockerfile
         container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name" .}}
-        command: fluentd -c /fluentd/etc/fluent.conf -v
+        command: fluentd -c /fluentd/etc/fluent.conf
         configs:
             - source: fluentd-config
               target: /fluentd/etc/fluent.conf
