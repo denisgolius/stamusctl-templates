@@ -11,7 +11,11 @@ services:
     ssl-keygen:
         image: nginx:1.27
         container_name: {{template "base-name" .}}-ssl-keygen-{{template "suffix-name" .}}
-        command: ['/bin/bash', '-c', 'openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca']
+        command: [
+            '/bin/bash',
+            '-c',
+            'if [ ! -e "/etc/nginx/ssl/scirius.crt" ]; then openssl req -verbose -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca; fi;'
+        ]
         restart: on-failure
         volumes:
             - nginx-ssl:/etc/nginx/ssl
