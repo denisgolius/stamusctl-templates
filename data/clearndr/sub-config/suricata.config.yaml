@@ -3,3 +3,7 @@ suricata:
     type: string
     usage: List of interfaces to monitor
     choices: interfaces
+  additionalconfig:
+    type: string
+    usage: Additional configuration for Suricata
+    default: " "

@@ -1029,3 +1029,5 @@ asn1-max-frames: 256
 unix-command:
   enabled: yes
   filename: /var/run/suricata/suricata-command.socket
+
+{{ .Values.suricata.additionalconfig }}
