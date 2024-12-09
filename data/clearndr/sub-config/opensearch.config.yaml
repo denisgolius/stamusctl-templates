@@ -6,7 +6,7 @@ opensearch:
   memory:
     type: string
     usage: Memory limit for OpenSearch
-    default: "3G"
+    default: "1g"
   datapath:
     type: string
     usage: Data path on host to store OpenSearch data
