@@ -3,6 +3,14 @@ opensearch:
     type: bool
     usage: Expose OpenSearch port
     default: false
+  memory:
+    type: string
+    usage: Memory limit for OpenSearch
+    default: "3G"
+  datapath:
+    type: string
+    usage: Data path on host to store OpenSearch data
+    default: "elastic-data"
   dashboards:
     type: optional
     usage: Enable OpenSearch Dashboards
