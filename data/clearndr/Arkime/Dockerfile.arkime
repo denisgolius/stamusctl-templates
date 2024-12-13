@@ -26,7 +26,7 @@ RUN $ARKIMEDIR/bin/arkime_update_geo.sh
 
 # add config
 
-FROM debian:bullseye as runner
+FROM debian:bookworm as runner
 
 # Declare args
 
@@ -37,7 +37,7 @@ ENV ARKIME_ADMIN_PASSWORD "selks-user"
 ENV ARKIME_HOSTNAME "arkime"
 ENV ARKIMEDIR "/opt/arkime"
 
-RUN apt-get update && apt-get install -y libpcre3 libyaml-0-2 libssl1.1 libmagic1 curl libwww-perl libjson-perl
+RUN apt-get update && apt-get install -y libpcre3 libyaml-0-2 libssl3 libmagic1 curl libwww-perl libjson-perl libpcap0.8 libglib2.0-0 libyara9 libmaxminddb0
 
 COPY --from=installer $ARKIMEDIR $ARKIMEDIR
 
