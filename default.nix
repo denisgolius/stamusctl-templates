@@ -1,4 +1,4 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.mkShell {
-  buildInputs = with pkgs; [ go gnumake ];
+  buildInputs = with pkgs; [ go gnumake hadolint ];
 }
