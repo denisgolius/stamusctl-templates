@@ -1,11 +1,8 @@
+FROM debian:bookworm as installer
 
-
-FROM debian:bullseye as installer
-
-# Declare args
-ARG ARKIME_VERSION=5.0.0
-ARG UBUNTU_VERSION=20.04
-ARG ARKIME_DEB_PACKAGE="arkime_"$ARKIME_VERSION"-1_amd64.deb"
+ARG ARKIME_VERSION=5.5.1
+ARG UBUNTU_VERSION=12
+ARG ARKIME_DEB_PACKAGE="arkime_"$ARKIME_VERSION"-1.debian"$UBUNTU_VERSION"_amd64.deb"
 ARG ARKIMEDIR "/opt/arkime"
 
 ENV ARKIME_VERSION $ARKIME_VERSION
@@ -19,8 +16,9 @@ RUN apt-get update && apt-get install -y curl wget logrotate
 RUN mkdir -p /tmp  /suricata-logs
 
 WORKDIR /tmp
-RUN wget -q "https://s3.amazonaws.com/files.molo.ch/builds/ubuntu-"$UBUNTU_VERSION"/"$ARKIME_DEB_PACKAGE
+RUN wget -q "https://github.com/arkime/arkime/releases/download/v"$ARKIME_VERSION"/"$ARKIME_DEB_PACKAGE
 RUN apt-get install -y ./$ARKIME_DEB_PACKAGE
+
 
 RUN wget -q -O /opt/arkime/etc/oui.txt "https://www.wireshark.org/download/automated/data/manuf"
 RUN $ARKIMEDIR/bin/arkime_update_geo.sh
