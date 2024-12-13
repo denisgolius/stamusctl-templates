@@ -7,7 +7,7 @@ on:
 env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}
-    GITHUB_TOKEN: ${{ secrets. PATNAME }}
+    GITHUB_TOKEN: ${{ secrets.PUSH }}
 
 jobs:
     build-and-push-clearndr:

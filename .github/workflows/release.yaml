@@ -4,6 +4,8 @@ on:
     push:
         branches:
             - main
+env:
+    GITHUB_TOKEN: ${{ secrets.PUSH }}
 
 jobs:
     create-tag:
