@@ -3,8 +3,6 @@ name: Create and publish Docker images
 
 on:
     push:
-        tags:
-            - '*'
 
 env:
     REGISTRY: ghcr.io
