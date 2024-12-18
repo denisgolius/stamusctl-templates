@@ -1,12 +1,12 @@
 configs:
     fluentd-config:
-        file: ../configs/fluentd/fluent.conf
+        file: fluentd/fluent.conf
     fluentd-template:
-        file: ../configs/fluentd/template.json
+        file: fluentd/template.json
     opensearch-config:
-        file: ../configs/opensearch/opensearch.yml
+        file: opensearch/opensearch.yml
     opensearch-dashboard-config:
-        file: ../configs/opensearch_dashboards/opensearch_dashboards.yml
+        file: opensearch_dashboards/opensearch_dashboards.yml
 
 volumes:
     elastic-data: #for ES data persistency
@@ -42,8 +42,8 @@ services:
 
     kibana:
         build:
-            context: ../opensearch-dashboard
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: Dockerfile.osd
         container_name: {{template "base-name" .}}-opensearch-dashboards-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
@@ -73,8 +73,8 @@ services:
 
     fluentd:
         build:
-            context: ../fluentd
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: Dockerfile.fluentd
         container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name" .}}
         command: fluentd -c /fluentd/etc/fluent.conf
         configs:

@@ -19,9 +19,9 @@ networks:
     network:
 
 include:
-    - sub-compose/db.yaml
-    - sub-compose/events-stack.yaml
-    - sub-compose/nginx.yaml
-    - sub-compose/scirius.yaml
-    - sub-compose/suricata.yaml
-    - sub-compose/utils.yaml
+    - db/db.compose.yaml
+    - events-stack/events-stack.compose.yaml
+    - nginx/nginx.compose.yaml
+    - scirius/scirius.compose.yaml
+    - suricata/suricata.compose.yaml
+    - utils/utils.compose.yaml

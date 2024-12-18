@@ -1,13 +1,12 @@
-includes:
-  ./sub-config/db.config.yaml
-  ./sub-config/opensearch.config.yaml
-  ./sub-config/suricata.config.yaml
-  ./sub-config/scirius.config.yaml
-  ./sub-config/utils.config.yaml
+includes: ./db/db.config.yaml
+    ./events-stack/opensearch.config.yaml
+    ./suricata/suricata.config.yaml
+    ./scirius/scirius.config.yaml
+    ./utils/utils.config.yaml
 
 globals:
-  restartmode:
-    type: string
-    usage: Restart mode for all services
-    default: unless-stopped
-    choices: restart
+    restartmode:
+        type: string
+        usage: Restart mode for all services
+        default: unless-stopped
+        choices: restart

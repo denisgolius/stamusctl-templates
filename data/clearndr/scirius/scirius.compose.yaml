@@ -1,6 +1,6 @@
 configs:
     scirius-start-sh:
-        file: ../configs/scirius/start-scirius.sh
+        file: start-scirius.sh
 
 volumes:
     scirius-data: #for scirius data persistency

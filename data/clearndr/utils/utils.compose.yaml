@@ -1,9 +1,3 @@
-configs:
-    cron-jobs-scirius-update-suri-rules:
-        file: ../configs/cron-jobs/scirius-update-suri-rules.sh
-    cron-jobs-suricata-logrotate:
-        file: ../configs/cron-jobs/suricata-logrotate.sh
-
 volumes:
     arkime-logs:
     arkime-pcap:
@@ -22,34 +16,12 @@ services:
         networks:
             network:
     {{- end }}
-    cron:
-        image: docker:27-cli
-        container_name: {{template "base-name" .}}-cron-{{template "suffix-name" .}}
-        healthcheck:
-            test: ['CMD', 'ps', '|', 'grep', 'crond']
-            interval: 1m
-            timeout: 1m
-            retries: 3
-        command:
-            [
-                sh,
-                -c,
-                "echo '*	*	 *	*	 *	run-parts /etc/periodic/1min' >> /etc/crontabs/root && crond -f -l 8",
-            ]
-        configs:
-            - source: cron-jobs-scirius-update-suri-rules
-              target: /etc/periodic/daily/scirius-update-suri-rules.sh
-            - source: cron-jobs-suricata-logrotate
-              target: /etc/periodic/daily/suricata-logrotate.sh
-        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
 
     {{- if .Values.arkime }}
     arkime:
         build:
-            context: ../Arkime
-            dockerfile: Dockerfile.arkime
+            context: ./Arkime
+            dockerfile: Dockerfile
         container_name: {{template "base-name" .}}-arkime-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:

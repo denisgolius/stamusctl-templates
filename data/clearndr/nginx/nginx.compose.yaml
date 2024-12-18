@@ -1,8 +1,8 @@
 configs:
     nginx-config:
-        file: ../configs/nginx/nginx.conf
+        file: nginx.conf
     nginx-selks-config:
-        file: ../configs/nginx/conf.d/selks6.conf
+        file: conf.d/selks6.conf
 
 volumes:
     nginx-ssl:

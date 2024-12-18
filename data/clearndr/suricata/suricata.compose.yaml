@@ -1,8 +1,8 @@
 configs:
     suricata-new-entrypoint:
-        file: ../configs/suricata/new_entrypoint.sh
+        file: new_entrypoint.sh
     suricata-selks6-addin:
-        file: ../configs/suricata/selks6-addin.yaml
+        file: selks6-addin.yaml
 
 volumes:
     suricata-rules: #for suricata rules transfer between scirius and suricata and for persistency
