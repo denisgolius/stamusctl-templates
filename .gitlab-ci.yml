@@ -108,8 +108,8 @@ create-tags:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
         - tag=$(cat version.txt)-gitlab
-        - git tag "$tag"
-        - git push --tags https://repo-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:latest
+        - git tag "$tag" -f
+        - git push --tags https://repo-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:latest -f
 
 create release:
   stage: release
