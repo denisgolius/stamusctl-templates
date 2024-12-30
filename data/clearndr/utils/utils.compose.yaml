@@ -19,9 +19,7 @@ services:
 
     {{- if .Values.arkime }}
     arkime:
-        build:
-            context: ./Arkime
-            dockerfile: Dockerfile
+        image: ghcr.io/stamusnetworks/stamus-images/arkime:5.5
         container_name: {{template "base-name" .}}-arkime-{{template "suffix-name" .}}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:
