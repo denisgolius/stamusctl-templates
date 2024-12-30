@@ -107,7 +107,7 @@ create-tags:
     script:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
-        - tag=$(cat version.txt)
+        - tag=$(cat version.txt)-gitlab
         - git tag "$tag"
         - git push --tags https://repo-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:latest
 
