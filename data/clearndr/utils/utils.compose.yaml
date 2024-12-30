@@ -34,6 +34,7 @@ services:
             retries: 3
         volumes:
             - {{ .Release.location }}/containers-data/suricata/logs:/suricata-logs:ro
+            - {{ .Release.location }}/containers-data/fpc:/suricata-logs/fpc:ro
             - {{ .Release.location }}/containers-data/arkime/logs:/opt/arkime/logs
             - arkime-pcap:/opt/arkime/raw
         {{- if or .Values.global.exposePorts .Values.arkime.openPort }}
