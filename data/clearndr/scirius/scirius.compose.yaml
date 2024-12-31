@@ -57,6 +57,7 @@ services:
             - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
             - {{ .Release.location }}/containers-data/suricata/rules:/rules
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
+            - {{ .Release.location }}/fpc:/var/log/suricata/fpc
         {{- if or .Values.global.exposePorts .Values.scirius.openPort }}
         ports:
             - 8000:8000
