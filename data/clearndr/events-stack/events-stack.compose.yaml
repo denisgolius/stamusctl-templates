@@ -26,7 +26,7 @@ services:
         environment:
             - plugins.security.disabled=true
             - discovery.type=single-node
-            - OPENSEARCH_JAVA_OPTS=-Xms{{ .Values.opensearch.memory | default "1g" }} -Xmx{{ .Values.opensearch.memory | default "1g" }}
+            - OPENSEARCH_JAVA_OPTS=-Xms{{ .Values.opensearch.memory | default "2g" }} -Xmx{{ .Values.opensearch.memory | default "2g" }}
         volumes:
             - {{ .Values.opensearch.datapath | default "elastic-data" }}:/usr/share/opensearch/data
         {{- if or .Values.global.exposePorts .Values.opensearch.openPort }}
