@@ -71,6 +71,7 @@ services:
 
     fluentd:
         image: ghcr.io/stamusnetworks/stamus-images/fluentd:1.16
+        user: root
         container_name: {{template "base-name" .}}-fluentd-{{template "suffix-name" .}}
         command: fluentd -c /fluentd/etc/fluent.conf
         configs:
