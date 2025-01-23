@@ -5,6 +5,7 @@ configs:
 volumes:
     scirius-data: #for scirius data persistency
     scirius-static: #statics files to be served by nginx
+    scirius-tmp:
     celery-git-path:
 
 services:
@@ -54,6 +55,7 @@ services:
             - scirius-data:/data/
             - suricata-run:/var/run/suricata
             - suricata-etc:/etc/suricata
+            - scirius-tmp:/tmp
             - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
             - {{ .Release.location }}/containers-data/suricata/rules:/rules
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
@@ -92,6 +94,7 @@ services:
         volumes:
             - scirius-data:/data/
             - suricata-etc:/etc/suricata
+            - scirius-tmp:/tmp
             - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
             - {{ .Release.location }}/containers-data/suricata/rules:/rules
         healthcheck:
@@ -129,6 +132,7 @@ services:
         volumes:
             - scirius-data:/data/
             - suricata-etc:/etc/suricata
+            - scirius-tmp:/tmp
             - {{ .Release.location }}/containers-data/scirius/logs/:/logs/
             - {{ .Release.location }}/containers-data/suricata/rules:/rules
         healthcheck:
