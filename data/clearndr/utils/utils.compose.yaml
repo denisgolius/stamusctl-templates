@@ -64,3 +64,31 @@ services:
         depends_on:
             - scirius
             - suricata
+
+    cron:
+        # This containers handles crontabs for the other containers, following the 1 task per container principle.
+        # It is based on  `docker:latest` image, wich is an alpine image with docker binary
+        container_name: {{template "base-name" .}}-cron-{{ .Release.seed }}
+        image: docker:latest
+        healthcheck:
+            test: ['CMD', 'ps', '|', 'grep', 'crond']
+            interval: 1m
+            timeout: 1m
+            retries: 3
+        command:
+            [
+                sh,
+                -c,
+                "echo '*	*	 *	*	 *	run-parts /etc/periodic/1min' >> /etc/crontabs/root && crond -f -l 8",
+            ]
+        restart: ${RESTART_MODE:-unless-stopped}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock # This bind-mout allows using the hosts docker deamon instead of created one inside the container
+
+            # Those volumes will contain the cron jobs
+            - ${PWD}/containers-data/cron-jobs/1min:/etc/periodic/1min/:ro
+            - ${PWD}/containers-data/cron-jobs/15min:/etc/periodic/15min/:ro
+            - ${PWD}/containers-data/cron-jobs/daily:/etc/periodic/daily/:ro
+            - ${PWD}/containers-data/cron-jobs/hourly:/etc/periodic/hourly/:ro
+            - ${PWD}/containers-data/cron-jobs/monthly:/etc/periodic/monthly/:ro
+            - ${PWD}/containers-data/cron-jobs/weekly:/etc/periodic/weekly/:ro
