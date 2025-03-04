@@ -6,14 +6,18 @@ configs:
 
 volumes:
     suricata-rules: #for suricata rules transfer between scirius and suricata and for persistency
+        name: suricata-rules-{{ .Release.seed }}
     suricata-run: #path where the suricata socket resides
+        name: suricata-run-{{ .Release.seed }}
     suricata-logs:
+        name: suricata-logs-{{ .Release.seed }}
     suricata-etc:
+        name: suricata-etc-{{ .Release.seed }}
 
 services:
     suricata:
         image: jasonish/suricata:7.0
-        container_name: {{template "base-name" .}}-suricata-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-suricata-{{ .Release.seed }}
         entrypoint: /new_entrypoint.sh
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:

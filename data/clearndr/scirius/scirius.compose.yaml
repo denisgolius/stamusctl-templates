@@ -4,16 +4,20 @@ configs:
 
 volumes:
     scirius-data: #for scirius data persistency
+        name: scirius-data-{{ .Release.seed }}
     scirius-static: #statics files to be served by nginx
+        name: scirius-static-{{ .Release.seed }}
     scirius-tmp:
+        name: scirius-tmp-{{ .Release.seed }}
     celery-git-path:
+        name: celery-git-path-{{ .Release.seed }}
 
 services:
 
     {{- if .Values.scirius }}
     scirius:
         image: {{ template "image-name" .Values.scirius }}
-        container_name: {{template "base-name" .}}-scirius-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-scirius-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
             interval: 10s
@@ -78,7 +82,7 @@ services:
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.worker }}
     celery-worker:
         image: {{ template "image-name" .Values.scirius }}
-        container_name: {{template "base-name" .}}-celery-worker-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-celery-worker-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         working_dir: /opt/scirius
         entrypoint: celery
@@ -116,7 +120,7 @@ services:
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.beat }}
     celery-beat:
         image: {{ template "image-name" .Values.scirius }}
-        container_name: {{template "base-name" .}}-celery-beat-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-celery-beat-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         working_dir: /opt/scirius
         entrypoint: celery
@@ -154,7 +158,7 @@ services:
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.flower }}
     celery-flower:
         image: {{ template "image-name" .Values.scirius }}
-        container_name: {{template "base-name" .}}-celery-flower-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-celery-flower-{{ .Release.seed }}
         restart: always
         command: celery --broker=amqp://guest:guest@rabbitmq:5672// flower -A suricata
         environment:

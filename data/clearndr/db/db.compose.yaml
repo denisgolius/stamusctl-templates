@@ -1,10 +1,11 @@
 volumes:
     db-data:
+        name: db-data-{{ .Release.seed }}
 
 services:
     db:
         image: postgres:17
-        container_name: {{template "base-name" .}}-db-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-db-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         shm_size: 128mb
         environment:
@@ -23,7 +24,7 @@ services:
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.worker .Values.rabbitmq }}
     rabbitmq:
         image: rabbitmq:3-management-alpine
-        container_name: {{template "base-name" .}}-rabbitmq-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-rabbitmq-{{ .Release.seed }}
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 30s

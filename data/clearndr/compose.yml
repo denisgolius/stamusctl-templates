@@ -17,6 +17,11 @@
 
 networks:
     network:
+        name: clearndr-{{ .Release.seed }}
+
+{{- if not (semverCompare ">=1.0.3" (index (splitList ":" .Release.service) 1)) }}
+{{- fail (printf "You are using %s. Please use version 1.0.3 or above" .Release.service) }}
+{{- end }}
 
 include:
     - db/db.compose.yaml

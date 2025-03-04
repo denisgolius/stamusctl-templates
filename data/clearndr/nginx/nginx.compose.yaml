@@ -6,11 +6,12 @@ configs:
 
 volumes:
     nginx-ssl:
+        name: nginx-ssl-{{ .Release.seed }}
 
 services:
     ssl-keygen:
         image: nginx:1.27
-        container_name: {{template "base-name" .}}-ssl-keygen-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-ssl-keygen-{{ .Release.seed }}
         command: [
             '/bin/bash',
             '-c',
@@ -24,7 +25,7 @@ services:
 
     nginx:
         image: nginx:1.27
-        container_name: {{template "base-name" .}}-nginx-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-nginx-{{ .Release.seed }}
         command: ['${NGINX_EXEC:-nginx}', '-g', 'daemon off;']
         configs:
             - source: nginx-config

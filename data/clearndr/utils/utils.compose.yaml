@@ -1,13 +1,16 @@
 volumes:
     arkime-logs:
+        name: arkime-logs-{{ .Release.seed }}
     arkime-pcap:
+        name: arkime-pcap-{{ .Release.seed }}
     arkime-config:
+        name: arkime-config-{{ .Release.seed }}
 
 services:
     {{- if .Values.evebox }}
     evebox:
         image: jasonish/evebox:{{ (.Values.evebox).version | default "master" }}
-        container_name: {{template "base-name" .}}-evebox-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-evebox-{{ .Release.seed }}
         command: ['-e', 'http://elasticsearch:9200']
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         environment:
@@ -20,7 +23,7 @@ services:
     {{- if .Values.arkime }}
     arkime:
         image: ghcr.io/stamusnetworks/stamus-images/arkime:5.5
-        container_name: {{template "base-name" .}}-arkime-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-arkime-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:
             elasticsearch:
@@ -33,7 +36,7 @@ services:
         volumes:
             - {{ .Release.location }}/containers-data/suricata/logs:/suricata-logs
             - {{ .Release.location }}/fpc:/suricata-logs/fpc
-            - {{ .Release.location }}/containers-data/arkime/logs:/opt/arkime/logs
+            - arkime-logs:/opt/arkime/logs
             - arkime-pcap:/opt/arkime/raw
         {{- if or .Values.global.exposePorts .Values.arkime.openPort }}
         depends_on:
@@ -47,9 +50,14 @@ services:
 
     ownership-fix:
         image: busybox
-        container_name: {{template "base-name" .}}-ownership-fix-{{template "suffix-name" .}}
+        container_name: {{template "base-name" .}}-ownership-fix-{{ .Release.seed }}
         entrypoint: /bin/sh -c
-        command: ['chown -R {{.Release.user}}:{{.Release.group}} /containers-data/scirius && chown -R {{.Release.user}}:{{.Release.group}} /containers-data/arkime && chown -R {{.Release.user}}:{{.Release.group}} /containers-data/suricata/rules']
+        command: [
+            'chown -R {{.Release.user}}:{{.Release.group}} /containers-data/scirius &&
+            chown -R {{.Release.user}}:{{.Release.group}} /containers-data/arkime &&
+            chown -R {{.Release.user}}:{{.Release.group}} /containers-data/suricata/rules &&
+            chmod -R 777 /containers-data/suricata'
+        ]
         restart: {{ .Values.globals.restartmode | default "on-failure" }}
         volumes:
             - {{ .Release.location | default ".." }}/containers-data:/containers-data
