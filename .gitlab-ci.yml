@@ -9,7 +9,7 @@ default:
 
 test clearndr:
     stage: tests
-    image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:main
+    image: git.stamus-networks.com:4567/devel/dev/stamus-ctl/cli:main
     tags:
       - k8s
     rules:
