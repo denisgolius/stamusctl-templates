@@ -13,6 +13,12 @@ volumes:
         name: suricata-logs-{{ .Release.seed }}
     suricata-etc:
         name: suricata-etc-{{ .Release.seed }}
+    suricata-logrotate:
+        name: suricata-logrotateetc-{{ .Release.seed }}
+        driver_opts:
+            type: none
+            o: bind
+            device: {{ .Release.location }}/containers-data/suricata/logrotate
 
 services:
     suricata:
@@ -34,11 +40,11 @@ services:
         volumes:
             - suricata-run:/var/run/suricata/
             - suricata-etc:/etc/suricata
+            - suricata-logrotate:/etc/logrotate.d/
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
             - {{ .Release.location }}/containers-data/suricata/etc:/etc/suricata
             - {{ .Release.location }}/containers-data/suricata/rules:/etc/suricata/rules
             - {{ .Release.location }}/fpc:/var/log/suricata/fpc
-            - {{ .Release.location }}/containers-data/suricata/logrotate:/etc/logrotate.d/
         depends_on:
             scirius:
                 condition: service_healthy
