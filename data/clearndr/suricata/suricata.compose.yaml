@@ -3,6 +3,8 @@ configs:
         file: new_entrypoint.sh
     suricata-selks6-addin:
         file: selks6-addin.yaml
+    suricata-logrotate:
+        file: suricata-logrotate
 
 volumes:
     suricata-rules: #for suricata rules transfer between scirius and suricata and for persistency
@@ -13,12 +15,6 @@ volumes:
         name: suricata-logs-{{ .Release.seed }}
     suricata-etc:
         name: suricata-etc-{{ .Release.seed }}
-    suricata-logrotate:
-        name: suricata-logrotateetc-{{ .Release.seed }}
-        driver_opts:
-            type: none
-            o: bind
-            device: {{ .Release.location }}/containers-data/suricata/logrotate
 
 services:
     suricata:
@@ -31,6 +27,8 @@ services:
               target: /new_entrypoint.sh
             - source: suricata-selks6-addin
               target: /etc/suricata-configs/selks6-addin.yaml
+            - source: suricata-logrotate
+              target: /etc/logrotate.d/suricata
         environment:
             - SURICATA_OPTIONS= -i {{.Values.suricata.interfaces | default "dummy0"}} -vvv --set sensor-name=suricata
         cap_add:
@@ -40,7 +38,6 @@ services:
         volumes:
             - suricata-run:/var/run/suricata/
             - suricata-etc:/etc/suricata
-            - suricata-logrotate:/etc/logrotate.d/
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
             - {{ .Release.location }}/containers-data/suricata/etc:/etc/suricata
             - {{ .Release.location }}/containers-data/suricata/rules:/etc/suricata/rules

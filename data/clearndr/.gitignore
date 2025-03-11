@@ -1,6 +1,0 @@
-logs/
-.env
-containers-data/suricata/etc/*.config
-containers-data/suricata/etc/suricata.yaml
-containers-data/suricata/etc/update.yaml
-containers-data/
