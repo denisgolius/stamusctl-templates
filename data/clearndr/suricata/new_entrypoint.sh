@@ -4,6 +4,9 @@ set -e
 cp /etc/suricata-configs/* /etc/suricata/.
 cp /new_entrypoint.sh /etc/suricata/.
 
+cp /etc/logrotate.d.dist/suricata /etc/logrotate.d/.
+chown root:root /etc/logrotate.d/suricata
+
 for src in /etc/suricata.dist/*; do
     filename=$(basename ${src})
     dst="/etc/suricata/${filename}"

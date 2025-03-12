@@ -28,7 +28,7 @@ services:
             - source: suricata-selks6-addin
               target: /etc/suricata-configs/selks6-addin.yaml
             - source: suricata-logrotate
-              target: /etc/logrotate.d/suricata
+              target: /etc/logrotate.d.dist/suricata
         environment:
             - SURICATA_OPTIONS= -i {{.Values.suricata.interfaces | default "dummy0"}} -vvv --set sensor-name=suricata
         cap_add:
