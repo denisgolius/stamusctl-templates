@@ -60,9 +60,7 @@ services:
         entrypoint: /bin/sh -c
         command: [
             'chown -R {{.Release.user}}:{{.Release.group}} /containers-data/scirius &&
-            chown -R {{.Release.user}}:{{.Release.group}} /containers-data/arkime &&
-            chown -R {{.Release.user}}:{{.Release.group}} /containers-data/suricata/rules &&
-            chmod -R 777 /containers-data/suricata'
+            chown -R {{.Release.user}}:{{.Release.group}} /containers-data/suricata/rules'
         ]
         restart: {{ .Values.globals.restartmode | default "on-failure" }}
         volumes:
