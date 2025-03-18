@@ -1030,4 +1030,8 @@ unix-command:
   enabled: yes
   filename: /var/run/suricata/suricata-command.socket
 
+datasets:
+  limits:
+    single-hashsize: 3000000
+
 {{ .Values.suricata.additionalconfig }}
