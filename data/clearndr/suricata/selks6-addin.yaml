@@ -1032,6 +1032,6 @@ unix-command:
 
 datasets:
   limits:
-    single-hashsize: 3000000
+    single-hashsize: 5000000
 
 {{ .Values.suricata.additionalconfig }}
