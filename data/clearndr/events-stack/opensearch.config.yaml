@@ -10,7 +10,7 @@ opensearch:
   datapath:
     type: string
     usage: Data path on host to store OpenSearch data
-    default: "elastic-data"
+    default: "opensearch-data"
   dashboards:
     type: optional
     usage: Enable OpenSearch Dashboards
@@ -19,3 +19,12 @@ opensearch:
       type: bool
       usage: Expose OpenSearch Dashboards port
       default: true
+  ism:
+    warm_min_index_age:
+      type: string
+      usage: Minimum index age before transitioning to warm state
+      default: "7d"
+    delete_min_index_age:
+      type: string
+      usage: Minimum index age before transitioning to delete state
+      default: "15d"

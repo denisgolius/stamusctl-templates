@@ -30,7 +30,7 @@ FROM debian:bookworm as runner
 
 # Declare args
 
-ENV ES_HOST "elasticsearch"
+ENV ES_HOST "opensearch"
 ENV ES_PORT 9200
 ENV ARKIME_ADMIN_USERNAME "selks-user"
 ENV ARKIME_ADMIN_PASSWORD "selks-user"

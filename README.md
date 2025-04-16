@@ -8,17 +8,30 @@ This template is used to deploy ClearNDR CE.
 
 #### Values
 
-| Config                         | description                                         | default                               |
-| ------------------------------ | --------------------------------------------------- | ------------------------------------- |
-| globals.restartmode            | restart mode of all services                        | "unless-stopped"                      |
-| opensearch.openPort            | Open port of opensearch to local network            | false                                 |
-| opensearch.dashboards.openPort | Open port of opensearch-dashboards to local network | false                                 |
-| scirius.registry               | Image registry where to find scirius image          | "ghcr.io/stamusnetworks/scirius"      |
-| scirius.version                | Scirius version to install                          | clearndr-ce-b1                        |
-| scirius.debug                  | Enable debug mode                                   | false                                 |
-| suricata.interfaces            | List of interfaces to monitor                       | "..."(all network interfaces on host) |
-| arkime.openPort                | Open port of Arkime Viewer                          | false                                 |
-| evebox.version                 | Evebox version to install                           | master                                |
+| Key                                 | Default                        | Usage                                                   |
+| ----------------------------------- | ------------------------------ | ------------------------------------------------------- |
+| arkime.openport                     | false                          | Open port for Arkime Viewer ?                           |
+| cron.logrotate.enabled              | true                           | Enable logrotate for Suricata logs                      |
+| cron.logrotate.period               | daily                          | Logrotate period (`1min`, `daily`, `weekly`, `monthly`) |
+| cron.updatesurirules.enabled        | true                           | Enable automatic update of Suricata rules               |
+| cron.updatesurirules.period         | daily                          | Update period (`1min`, `daily`, `weekly`, `monthly`)    |
+| evebox.version                      | master                         | Evebox version to install                               |
+| globals.restartmode                 | unless-stopped                 | Restart mode for all services                           |
+| opensearch.dashboards.openport      | true                           | Expose OpenSearch Dashboards port                       |
+| opensearch.datapath                 | opensearch-data                | Data path on host to store OpenSearch data              |
+| opensearch.ism.delete_min_index_age | 15d                            | Minimum index age before transitioning to delete state  |
+| opensearch.ism.warm_min_index_age   | 7d                             | Minimum index age before transitioning to warm state    |
+| opensearch.memory                   | 2g                             | Memory limit for OpenSearch                             |
+| opensearch.openport                 | false                          | Expose OpenSearch port                                  |
+| rabbitmq.openport                   | false                          | Expose RabbitMQ port                                    |
+| scirius.celery.beat.restart         | unless-stopped                 | Celery beat restart mode                                |
+| scirius.celery.worker.restart       | unless-stopped                 | Celery worker restart mode                              |
+| scirius.debug                       | false                          | Enable debug mode                                       |
+| scirius.registry                    | ghcr.io/stamusnetworks/scirius | Image registry where to find scirius image              |
+| scirius.version                     | clear-ndr-rc1                  | Scirius version to install                              |
+| suricata.additionalconfig           |                                | Additional configuration for Suricata                   |
+| suricata.interfaces                 |                                | List of interfaces to monitor                           |
+| suricata.unixsocket.enabled         | false                          | Enable Unix Socket Output for Suricata Eve logs ?       |
 
 ## Top level variables in templates
 

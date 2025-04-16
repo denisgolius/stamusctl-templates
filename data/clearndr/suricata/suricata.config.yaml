@@ -7,3 +7,8 @@ suricata:
     type: string
     usage: Additional configuration for Suricata
     default: " "
+  unixSocket:
+    enabled:
+      type: bool
+      usage: Enable Unix Socket Output for Suricata Eve logs ?
+      default: false
