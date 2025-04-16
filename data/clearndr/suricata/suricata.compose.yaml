@@ -15,6 +15,10 @@ volumes:
         name: suricata-logs-{{ .Release.seed }}
     suricata-etc:
         name: suricata-etc-{{ .Release.seed }}
+    {{ if .Values.suricata.unixSocket.enabled -}}
+    suricata-socket:
+        name: suricata-socket-{{ .Release.seed }}
+    {{- end }}
 
 services:
     suricata:
@@ -38,7 +42,11 @@ services:
         volumes:
             - suricata-run:/var/run/suricata/
             - suricata-etc:/etc/suricata
+            {{- if .Values.suricata.unixSocket.enabled }}
+            - suricata-socket:/var/run/suricata/
+            {{- else }}
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
+            {{- end }}
             - {{ .Release.location }}/containers-data/suricata/etc:/etc/suricata
             - {{ .Release.location }}/containers-data/suricata/rules:/etc/suricata/rules
             - {{ .Release.location }}/fpc:/var/log/suricata/fpc

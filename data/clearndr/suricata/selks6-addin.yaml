@@ -187,9 +187,15 @@ outputs:
 
   # Extensible Event Format (nicknamed EVE) event log in JSON format
   - eve-log:
-      enabled: yes
+      enabled: true
+      {{- if .Values.suricata.unixSocket.enabled }}
+      ethernet: true
+      filename: /var/log/suricata/tls_buffer.sock
+      filetype: unix_stream
+      {{- else }}
       filetype: regular #regular|syslog|unix_dgram|unix_stream|redis
       filename: eve.json
+      {{- end }}
       #prefix: "@cee: " # prefix to prepend to each log entry
       # the following are valid when type: syslog above
       #identity: "suricata"

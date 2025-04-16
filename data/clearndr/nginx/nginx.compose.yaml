@@ -9,6 +9,8 @@ volumes:
         name: nginx-ssl-{{ .Release.seed }}
 
 services:
+	{{- if .Values.nginx.ssl.enabled }}
+    {{- if not .Values.nginx.ssl.sslFolder }}
     ssl-keygen:
         image: nginx:1.27
         container_name: {{template "base-name" .}}-ssl-keygen-{{ .Release.seed }}
@@ -22,6 +24,8 @@ services:
             - nginx-ssl:/etc/nginx/ssl
         networks:
             network:
+    {{- end }}
+    {{- end }}
 
     nginx:
         image: nginx:1.27
@@ -40,13 +44,24 @@ services:
             retries: 5
         volumes:
             - scirius-static:/static/:ro
+        	{{- if .Values.nginx.ssl.enabled }}
+            {{- if .Values.nginx.ssl.sslFolder }}
+            - {{ .Values.nginx.ssl.sslFolder }}:/etc/nginx/ssl:ro
+            {{- else }}
             - nginx-ssl:/etc/nginx/ssl:ro
+            {{- end }}
+            {{- end }}
         depends_on:
+        	{{- if and .Values.nginx.ssl.enabled (not .Values.nginx.ssl.sslFolder) }}
             ssl-keygen:
                 condition: service_completed_successfully
+            {{- end }}
             scirius: #we need to wait for scirius to populate the static files
                 condition: service_healthy
         ports:
+        	{{- if .Values.nginx.ssl.enabled }}
             - 443:443
+            {{- end }}
+            - 80:80
         networks:
             network:

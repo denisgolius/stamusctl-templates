@@ -5,6 +5,7 @@ This is the crontab root file inside the container :
 
 ```bash
 # min	hour    day	month	weekday	command
+*	    *	    *	*	    *	run-parts /etc/periodic/1min
 */15	*	    *	*	    *	    run-parts /etc/periodic/15min
 0	    *	    *	*	    *	    run-parts /etc/periodic/hourly
 0	    2	    *	*	    *	    run-parts /etc/periodic/daily
