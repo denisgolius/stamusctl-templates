@@ -1,0 +1,53 @@
+{
+    "policy": {
+        "description": "ISM policy for '{{ .Values.opensearch.index | default "logstash" }}-*' indexes used by ClearNDR",
+        "default_state": "hot",
+        "ism_template": [
+            {
+                "index_patterns": ["{{ .Values.opensearch.index | default "logstash" }}-*"],
+                "priority": 999
+            }
+        ],
+        "states": [
+            {
+                "name": "hot",
+                "actions":[],
+                "transitions": [
+                    {
+                        "state_name": "warm",
+                        "conditions": {
+                            "min_index_age": "{{ .Values.opensearch.ism.warm_min_index_age | default "7d"}}"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "warm",
+                "actions": [
+                    {
+                        "close": {}
+                    },
+                    {
+                        "read_only": {}
+                    }
+                ],
+                "transitions": [
+                    {
+                        "state_name": "delete",
+                        "conditions": {
+                            "min_index_age": "{{ .Values.opensearch.ism.delete_min_index_age | default "15d"}}"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "actions": [
+                    {
+                        "delete": {}
+                    }
+                ]
+            }
+        ]
+    }
+}

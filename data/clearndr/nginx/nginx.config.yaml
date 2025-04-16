@@ -1,0 +1,18 @@
+nginx:
+  ssl:
+    enabled:
+      type: bool
+      default: true
+      usage: Enable SSL for NGINX
+    folder:
+      type: string
+      default: ""
+      usage: Folder on host containing SSL certificates. If set, disable automatic generation of self-signed certificates. Use absolute path.
+    keyname:
+      type: string
+      default: "scirius.key"
+      usage: Name of the private key file. Used only if ssl.enabled is true.
+    certname:
+      type: string
+      default: "scirius.crt"
+      usage: Name of the certificate file. Used only if ssl.enabled is true.

@@ -9,14 +9,19 @@ configs:
         file: opensearch_dashboards/opensearch_dashboards.yml
 
 volumes:
-    elastic-data: #for ES data persistency
-        name: elastic-data-{{ .Release.seed }}
+    {{- if or (eq .Values.opensearch.datapath "opensearch-data") (eq .Values.opensearch.datapath "elastic-data") }}
+    {{ .Values.opensearch.datapath }}: #for ES data persistency
+        name: {{ .Values.opensearch.datapath }}-{{ .Release.seed }}
+    {{- else }}
+    opensearch-data: #for ES data persistency
+        name: opensearch-data-{{ .Release.seed }}
+    {{- end }}
     fluentd-pos:
         name: fluentd-pos-{{ .Release.seed }}
 
 services:
-    elasticsearch:
-        image: opensearchproject/opensearch:1.3.19
+    opensearch:
+        image: opensearchproject/opensearch:2.19.0
         container_name: {{template "base-name" .}}-opensearch-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         healthcheck:
@@ -29,8 +34,9 @@ services:
             - plugins.security.disabled=true
             - discovery.type=single-node
             - OPENSEARCH_JAVA_OPTS=-Xms{{ .Values.opensearch.memory | default "2g" }} -Xmx{{ .Values.opensearch.memory | default "2g" }}
+            - OPENSEARCH_INITIAL_ADMIN_PASSWORD=YH8pq2lqNSnVEQZ
         volumes:
-            - {{ .Values.opensearch.datapath | default "elastic-data" }}:/usr/share/opensearch/data
+            - {{ .Values.opensearch.datapath | default "opensearch-data" }}:/usr/share/opensearch/data
         {{- if or .Values.global.exposePorts .Values.opensearch.openPort }}
         ports:
             - 9200:9200
@@ -42,8 +48,11 @@ services:
         networks:
             network:
 
-    kibana:
-        image: ghcr.io/stamusnetworks/stamus-images/opensearch-dashboards:1.3
+    opensearch-dashboards:
+        image: ghcr.io/stamusnetworks/stamus-images/opensearch-dashboards:2.19
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile.osd
         container_name: {{template "base-name" .}}-opensearch-dashboards-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         configs:
@@ -62,7 +71,7 @@ services:
             retries: 3
             start_period: 30s
         depends_on:
-            elasticsearch:
+            opensearch:
                 condition: service_healthy
         {{- if or .Values.global.exposePorts .Values.opensearch.dashboard.openPort }}
         ports:
@@ -73,6 +82,9 @@ services:
 
     fluentd:
         image: ghcr.io/stamusnetworks/stamus-images/fluentd:1.16
+        # build:
+        #     context: .
+        #     dockerfile: Dockerfile.fluentd
         user: root
         container_name: {{template "base-name" .}}-fluentd-{{ .Release.seed }}
         command: fluentd -c /fluentd/etc/fluent.conf
@@ -86,3 +98,25 @@ services:
             - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata:ro
         networks:
             network:
+
+    {{ if .Values.suricata.unixSocket.enabled -}}
+    socat:
+        image: alpine/socat:1.8.0.1
+        container_name: {{template "base-name" .}}-socat-{{ .Release.seed }}
+        user: root
+        command: UNIX-LISTEN:/var/log/suricata/tls_buffer.sock TCP:fluentd:20001
+        volumes:
+            - suricata-socket:/var/run/suricata/
+        networks:
+            network:
+
+    socat-readpcap:
+        image: alpine/socat:1.8.0.1
+        container_name: {{template "base-name" .}}-socat-readpcap-{{ .Release.seed }}
+        user: root
+        command: UNIX-LISTEN:/var/log/suricata/tls_buffer.sock TCP:fluentd:20001
+        volumes:
+            - {{ .Release.location }}/containers-data/suricata/logs:/var/log/suricata
+        networks:
+            network:
+    {{- end }}

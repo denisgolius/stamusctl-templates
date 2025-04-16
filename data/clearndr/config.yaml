@@ -1,5 +1,6 @@
 includes: ./db/db.config.yaml
     ./events-stack/opensearch.config.yaml
+    ./nginx/nginx.config.yaml
     ./suricata/suricata.config.yaml
     ./scirius/scirius.config.yaml
     ./utils/utils.config.yaml

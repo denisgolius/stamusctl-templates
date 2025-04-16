@@ -5,19 +5,25 @@ volumes:
         name: arkime-pcap-{{ .Release.seed }}
     arkime-config:
         name: arkime-config-{{ .Release.seed }}
+    setup-ism-tfstate:
+        name: setup-ism-tfstate-{{ .Release.seed }}
 
 configs:
     cron-daily-logrotate:
         file: cron/daily/suricata-logrotate.sh
     cron-daily-scirius:
         file: cron/daily/scirius-update-suri-rules.sh
+    ism-tf:
+        file: ism/main.tf
+    ism-json:
+        file: ism/hot_warm_delete.json
 
 services:
     {{- if .Values.evebox }}
     evebox:
         image: jasonish/evebox:{{ (.Values.evebox).version | default "master" }}
         container_name: {{template "base-name" .}}-evebox-{{ .Release.seed }}
-        command: ['-e', 'http://elasticsearch:9200']
+        command: ['-e', 'http://opensearch:9200']
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         environment:
             - EVEBOX_HTTP_TLS_ENABLED=false
@@ -32,7 +38,7 @@ services:
         container_name: {{template "base-name" .}}-arkime-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
         depends_on:
-            elasticsearch:
+            opensearch:
                 condition: service_healthy
         healthcheck:
             test: ['CMD', 'curl', '-f', 'http://scirius:8000/arkime']
@@ -45,8 +51,6 @@ services:
             - arkime-logs:/opt/arkime/logs
             - arkime-pcap:/opt/arkime/raw
         {{- if or .Values.global.exposePorts .Values.arkime.openPort }}
-        depends_on:
-            - suricata
         ports:
             - 8005:8005
         {{- end }}
@@ -83,11 +87,57 @@ services:
                 -c,
                 "echo '*	*	 *	*	 *	run-parts /etc/periodic/1min' >> /etc/crontabs/root && crond -f -l 8",
             ]
-        restart: ${RESTART_MODE:-unless-stopped}
+        restart: {{ .Values.globals.restartmode | default "on-failure" }}
         configs:
+            {{- if .Values.cron.logrotate.enabled }}
             - source: cron-daily-logrotate
-              target: /etc/periodic/daily/suricata-logrotate.sh
+              target: /etc/periodic/{{ .Values.cron.logrotate.period | default "daily" }}/suricata-logrotate.sh
+            {{- end }}
+            {{- if .Values.cron.updateSuriRules.enabled }}
             - source: cron-daily-scirius
-              target: /etc/periodic/daily/scirius-update-suri-rules.sh
+              target: /etc/periodic/{{ .Values.cron.updateSuriRules.period | default "daily" }}/scirius-update-suri-rules.sh
+            {{- end }}
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
+
+    setup-ism:
+        container_name: {{template "base-name" .}}-setup-ism-{{.Values.opensearch.ism.warm_min_index_age}}-{{.Values.opensearch.ism.delete_min_index_age}}-{{ .Release.seed }}
+        image: hashicorp/terraform:1.9
+        entrypoint: /bin/sh -c
+        command:
+            [
+                "terraform init -input=false && terraform apply -input=false -auto-approve -state=/state/terraform.tfstate",
+            ]
+        working_dir: /setup
+        configs:
+            - source: ism-tf
+              target: /setup/main.tf
+            - source: ism-json
+              target: /setup/hot_warm_delete.json
+        volumes:
+            - setup-ism-tfstate:/state
+        restart: "on-failure"
+        networks:
+            network:
+        depends_on:
+            opensearch-dashboards:
+                condition: service_healthy
+
+
+    setup-job_interval:
+        container_name: {{template "base-name" .}}-setup-job_interval-{{ .Release.seed }}
+        image: curlimages/curl:8.13.0
+        command: >
+            -XPUT -H 'Content-Type: application/json' http://opensearch-dashboards:5601/_cluster/settings?pretty=true -H 'osd-xsrf: true'
+            -d '{
+                "persistent" : {
+                    "plugins.index_state_management.job_interval" : 1,
+                    "logger.org.opensearch.indexmanagement": "DEBUG"
+                }
+            }'
+        restart: "on-failure"
+        depends_on:
+            opensearch-dashboards:
+                condition: service_healthy
+        networks:
+            network:
