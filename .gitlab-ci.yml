@@ -87,14 +87,11 @@ clearndr:
 release-to-github:
     stage: release
     image: bitnami/git
-    rules:
-    - if: '$CI_COMMIT_REF_NAME == "latest"'
-      when: on_success
     script:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
         - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl-templates.git"
-        - git push github HEAD:next
+        - git push -u --no-thin -f github HEAD:refs/heads/$CI_COMMIT_BRANCH
 
 
 create-tags:
