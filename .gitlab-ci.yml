@@ -7,35 +7,28 @@ default:
   tags:
     - k8s-small
 
-# test clearndr:
-#     stage: tests
-#     image: git.stamus-networks.com:4567/devel/dev/stamus-ctl/cli:main
-#     tags:
-#       - k8s
-#     rules:
-#     - if: $CI_COMMIT_REF_NAME
-#       when: on_success
-#     variables:
-#         DOCKER_HOST: tcp://docker:2376
-#         DOCKER_TLS_CERTDIR: '/certs'
-#         DOCKER_TLS_VERIFY: 1
-#         DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
-#     services:
-#         - docker:24.0.5-dind
-#     script:
-#         - apk update && apk add jq docker
-#         - stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
-#         - docker login $CI_REGISTRY --username $GITLAB_REGISTRY_USER --password $GITLAB_REGISTRY_TOKEN
-#         - stamusctl compose init --default --template data/clearndr/ suricata.interfaces=lo globals.skiprandom=true opensearch.memory=1gb
-#         - stamusctl compose up -d
-#         - docker inspect config-nginx-1 | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
-#         - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.Status == "exited"'
-#         - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.Status == "exited"'
-#         - docker inspect config-ssl-keygen-1 | jq -e '.[0].State.ExitCode == 0'
-#         - stamusctl compose down
-#         - stamusctl config set globals.restartmode=always
-#         - stamusctl compose up -d
-#         - docker inspect config-nginx-1 | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
+workflow:
+    rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+        - if: $CI_COMMIT_TAG
+        - if: $CI_COMMIT_BRANCH == "main"
+
+lint-commits:
+    tags:
+        - k8s-small
+    image: registry.hub.docker.com/library/node:22-alpine
+    stage: tests
+    needs: []
+    before_script:
+        - apk add --no-cache git
+        - npm install --save-dev @commitlint/config-conventional @commitlint/cli
+    variables:
+        GIT_DEPTH: 0
+    script:
+        - npx commitlint --from ${CI_MERGE_REQUEST_DIFF_BASE_SHA} --to ${CI_COMMIT_SHA}
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 
 tests:
     stage: docker
@@ -87,34 +80,47 @@ clearndr:
 release-to-github:
     stage: release
     image: bitnami/git
+    rules:
+        - if: $CI_COMMIT_BRANCH
     script:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
         - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl-templates.git"
         - git push -u --no-thin -f github HEAD:refs/heads/$CI_COMMIT_BRANCH
 
-
-create-tags:
+release-to-github-from-mr:
     stage: release
     image: bitnami/git
     rules:
-    - if: '$CI_COMMIT_REF_NAME == "latest"'
-      when: on_success
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     script:
         - git config --global user.email $GITLAB_USER_EMAIL
         - git config --global user.name $GITLAB_USER_NAME
-        - tag=$(cat version.txt)-gitlab
-        - git tag "$tag" -f
-        - git push --tags https://repo-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:latest -f
+        - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl-templates.git"
+        - git push -u --no-thin -f github HEAD:refs/heads/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
 
-create release:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  allow_failure: true
-  rules:
-    - if: $CI_COMMIT_TAG
-  script:
-    - echo "running release_job"
-  release:
-    tag_name: '$CI_COMMIT_TAG'
-    description: '$CI_COMMIT_TAG'
+
+create release with semantic-release:
+    stage: release
+    image: node:22
+    before_script:
+        - corepack enable
+        - corepack prepare pnpm@latest --activate
+        - pnpm config set store-dir .pnpm-store
+    cache:
+        key:
+            files:
+                - pnpm-lock.yaml
+        paths:
+            - .pnpm-store
+    variables:
+        GITLAB_TOKEN: $ACCESS_TOKEN
+    script:
+        - git config user.email $GITLAB_USER_EMAIL
+        - git config user.name $GITLAB_USER_NAME
+        - pnpm i
+        - export NEXT_VERSION=$(pnpm run release --no-ci --dry-run | grep -oP 'The next release version is \K[0-9]+\.[0-9]+\.[0-9]+[-A-Za-z0-9.]+')
+        - pnpm run release --no-ci
+    rules:
+        - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+        - if: $CI_COMMIT_BRANCH == "main"
