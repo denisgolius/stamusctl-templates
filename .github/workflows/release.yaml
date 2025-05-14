@@ -16,7 +16,6 @@ env:
 jobs:
   release:
     name: Release
-    needs: [build-stamusctl, build-stamusdaemon]
 
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -30,15 +29,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Download stamusctl
-        uses: actions/download-artifact@v4
-        with:
-          name: stamusctl-${{matrix.os}}-${{matrix.arch}}
-      - name: Download stamusd
-        uses: actions/download-artifact@v4
-        with:
-          name: stamusd-${{matrix.os}}-${{matrix.arch}}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
