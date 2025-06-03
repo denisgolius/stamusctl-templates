@@ -86,7 +86,7 @@ services:
         image: {{ template "image-name" .Values.scirius }}
         container_name: {{template "base-name" .}}-celery-worker-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
-        working_dir: /opt/scirius
+        working_dir: /code
         entrypoint: celery
         command: -A suricata worker --loglevel=info
         environment:
@@ -124,7 +124,7 @@ services:
         image: {{ template "image-name" .Values.scirius }}
         container_name: {{template "base-name" .}}-celery-beat-{{ .Release.seed }}
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
-        working_dir: /opt/scirius
+        working_dir: /code
         entrypoint: celery
         command: -A suricata beat --loglevel=info
         environment:
