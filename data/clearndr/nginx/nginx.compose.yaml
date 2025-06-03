@@ -10,7 +10,7 @@ volumes:
 
 services:
 	{{- if .Values.nginx.ssl.enabled }}
-    {{- if not .Values.nginx.ssl.sslFolder }}
+    {{- if not .Values.nginx.ssl.folder }}
     ssl-keygen:
         image: nginx:1.27
         container_name: {{template "base-name" .}}-ssl-keygen-{{ .Release.seed }}
@@ -45,14 +45,14 @@ services:
         volumes:
             - scirius-static:/static/:ro
         	{{- if .Values.nginx.ssl.enabled }}
-            {{- if .Values.nginx.ssl.sslFolder }}
-            - {{ .Values.nginx.ssl.sslFolder }}:/etc/nginx/ssl:ro
+            {{- if .Values.nginx.ssl.folder }}
+            - {{ .Values.nginx.ssl.folder }}:/etc/nginx/ssl:ro
             {{- else }}
             - nginx-ssl:/etc/nginx/ssl:ro
             {{- end }}
             {{- end }}
         depends_on:
-        	{{- if and .Values.nginx.ssl.enabled (not .Values.nginx.ssl.sslFolder) }}
+        	{{- if and .Values.nginx.ssl.enabled (not .Values.nginx.ssl.folder) }}
             ssl-keygen:
                 condition: service_completed_successfully
             {{- end }}
