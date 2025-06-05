@@ -17,6 +17,10 @@ configs:
         file: ism/main.tf
     ism-json:
         file: ism/hot_warm_delete.json
+    arkime-config:
+        file: Arkime/arkimepcapread-selks-config.ini
+    arkime-start:
+        file: Arkime/start-arkimeviewer.sh
 
 services:
     {{- if .Values.evebox }}
@@ -48,8 +52,14 @@ services:
             interval: 15s
             timeout: 5s
             retries: 3
+        configs:
+            - source: arkime-config
+              target: /opt/arkime/etc/config.ini
+            - source: arkime-start
+              target: /start-arkimeviewer.sh
         volumes:
             - {{ .Release.location }}/containers-data/suricata/logs:/suricata-logs
+            - {{ .Release.location }}/containers-data/arkime/logs:/opt/arkime/logs
             - {{ .Release.location }}/fpc:/suricata-logs/fpc
             - arkime-logs:/opt/arkime/logs
             - arkime-pcap:/opt/arkime/raw
