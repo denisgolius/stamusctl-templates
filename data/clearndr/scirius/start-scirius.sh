@@ -20,7 +20,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cd /opt/scirius/
+cd /code
+
+cp /code/docker/scirius/scirius/local_settings.py /code/scirius/local_settings.py
+cp -rf /ui/* /code/rules/static
+cp /ui/webpack-stats-ui.prod.json /code/rules/static/webpack-stats-ui.prod.json
 
 migrate_db() {
     python manage.py makemigrations --noinput
@@ -29,12 +33,6 @@ migrate_db() {
 }
 
 create_db() {
-    echo mkdir -p /data/git-sources
-    mkdir -p /data/git-sources
-
-    echo chmod -R 777 /var/run/suricata
-    chmod -R 777 /var/run/suricata
-
     python manage.py makemigrations --noinput
     python manage.py migrate --run-syncdb --noinput
 
@@ -47,7 +45,7 @@ create_db() {
     echo "from django.contrib.auth.models import User, Group; u = User.objects.filter(username='selks-user').first(); g = Group.objects.filter(name='Superuser').first(); g.user_set.add(u)" | python manage.py shell
 
     python manage.py createcachetable my_cache_table
-    python manage.py addsource "ETOpen Ruleset" https://rules.emergingthreats.net/open/suricata-5.0/emerging.rules.tar.gz http sigs
+    python manage.py addsource "ETOpen Ruleset" https://rules.emergingthreats.net/open/suricata-7.0.3/emerging.rules.tar.gz http sigs
     python manage.py addsource "Lateral movement ruleset" https://ti.stamus-networks.io/open/stamus-lateral-rules.tar.gz http sigs
     python manage.py defaultruleset "Default ruleset"
     python manage.py disablecategory "Default ruleset" stream-events
@@ -64,9 +62,6 @@ start() {
     # cd ..
     # cp -rT doc/_build/html /static/doc
     python manage.py collectstatic --noinput
-    echo "Starting suri-reloader daemon..."
-    rm -f /var/run/suri_reloader.pid
-    python /opt/scirius/docker/scirius/suricata/scripts/suri_reloader &
     echo "Starting scirius server..."
     if [ "$DEBUG" == "True" ]; then
         echo DEBUG
@@ -78,15 +73,15 @@ start() {
 
 if [ ! -e "/data/scirius.data" ]; then
     create_db
-    /opt/scirius/docker/scirius/bin/reset_dashboards.sh
-    # /opt/scirius/docker/scirius/bin/create_ILM_policy.sh
+    /code/docker/scirius/bin/reset_dashboards.sh
+    # /code/docker/scirius/bin/create_ILM_policy.sh
 else
     migrate_db
 fi
 
 if [ -n "$KIBANA_RESET_DASHBOARDS" ]; then
     echo "Resetting Kibana dashboards..."
-    /opt/scirius/docker/scirius/bin/reset_dashboards.sh
+    /code/docker/scirius/bin/reset_dashboards.sh
 fi
 
 start
