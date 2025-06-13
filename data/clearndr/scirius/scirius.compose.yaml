@@ -1,6 +1,8 @@
 configs:
     scirius-start-sh:
         file: start-scirius.sh
+    suricata-reloader-start-sh:
+        file: start-suri-reloader.sh
 
 volumes:
     scirius-data: #for scirius data persistency
@@ -55,7 +57,7 @@ services:
             - ELASTICSEARCH_LOGSTASH_ALERT_INDEX={{ .Values.opensearch.index | default "logstash" }}-alert
         configs:
             - source: scirius-start-sh
-              target: /opt/scirius/docker/scirius/bin/start-scirius.sh
+              target: /code/docker/scirius/bin/start-scirius.sh
         volumes:
             - scirius-static:/static/
             - scirius-data:/data/
@@ -79,7 +81,33 @@ services:
                 condition: service_healthy
             opensearch-dashboards:
                 condition: service_healthy
+
+    suri-reloader:
+        image: {{ template "image-name" .Values.scirius }}
+        container_name: {{template "base-name" .}}-suri-reloader-{{ .Release.seed }}
+        entrypoint: /start-suri-reloader.sh
+        restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
+        environment:
+            - SURICATA_UNIX_SOCKET=/var/run/suricata/suricata-command.socket
+        healthcheck:
+            interval: 10s
+            timeout: 1s
+            retries: 5
+            start_period: 5m
+        configs:
+            - source: suricata-reloader-start-sh
+              target: /start-suri-reloader.sh
+        volumes:
+            - suricata-run:/var/run/suricata
+            - {{ .Release.location }}/containers-data/scirius/logs/:/logs
+            - {{ .Release.location }}/containers-data/suricata/rules:/rules
+        networks:
+            network:
+        depends_on:
+            scirius:
+                condition: service_healthy
     {{- end }}
+
 
     {{- if and .Values.scirius .Values.scirius.celery .Values.scirius.celery.worker }}
     celery-worker:
