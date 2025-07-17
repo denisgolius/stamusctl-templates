@@ -22,7 +22,7 @@ volumes:
 
 services:
     suricata:
-        image: jasonish/suricata:7.0
+        image: jasonish/suricata:8.0
         container_name: {{template "base-name" .}}-suricata-{{ .Release.seed }}
         entrypoint: /new_entrypoint.sh
         restart: {{ .Values.globals.restartmode | default "unless-stopped" }}
