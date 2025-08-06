@@ -67,7 +67,7 @@ start() {
         echo DEBUG
         python manage.py runserver 0.0.0.0:8000
     else
-        gunicorn -w $(($(nproc --all) * 2 + 1)) -t 120 -b 0.0.0.0:8000 scirius.wsgi
+        gunicorn -w $(($(nproc) * 2 + 1)) -t 120 -b 0.0.0.0:8000 scirius.wsgi
     fi
 }
 
