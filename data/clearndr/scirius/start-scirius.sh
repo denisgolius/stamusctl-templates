@@ -40,9 +40,9 @@ create_db() {
     if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ]; then
         echo "from django.contrib.auth.models import User; User.objects.create_superuser('$DJANGO_SUPERUSER_USERNAME', '$DJANGO_SUPERUSER_EMAIL', '$DJANGO_SUPERUSER_PASSWORD')" | python manage.py shell
     else
-        echo "from django.contrib.auth.models import User; User.objects.create_superuser('selks-user', 'selks-user@selks.com', 'selks-user')" | python manage.py shell
+        echo "from django.contrib.auth.models import User; User.objects.create_superuser('clearndr', 'user@clearndr.com', 'clearndr')" | python manage.py shell
     fi
-    echo "from django.contrib.auth.models import User, Group; u = User.objects.filter(username='selks-user').first(); g = Group.objects.filter(name='Superuser').first(); g.user_set.add(u)" | python manage.py shell
+    echo "from django.contrib.auth.models import User, Group; u = User.objects.filter(username='clearndr').first(); g = Group.objects.filter(name='Superuser').first(); g.user_set.add(u)" | python manage.py shell
 
     python manage.py createcachetable my_cache_table
     python manage.py addsource "ETOpen Ruleset" https://rules.emergingthreats.net/open/suricata-7.0.3/emerging.rules.tar.gz http sigs
