@@ -364,7 +364,6 @@ outputs:
             # default), just enough information to map a MAC address
             # to an IP address is logged.
             extended: yes
-        - ssh
         - mqtt:
             # passwords: yes           # enable output of passwords
             # string-log-limit: 1KiB   # limit size of logged strings in bytes.
