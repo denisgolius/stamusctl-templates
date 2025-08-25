@@ -669,7 +669,7 @@ app-layer:
       enabled: yes
     ssh:
       enabled: yes
-      # hassh: no
+      hassh: yes
 
       # What to do when the encrypted communications start:
       # - track-only: keep tracking but stop inspection (default)
