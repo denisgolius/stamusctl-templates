@@ -53,7 +53,7 @@ services:
             - DATABASE_PASSWORD=selks
             - DATABASE_HOST=db
             - DATABASE_PORT=5432
-            - ELASTICSEARCH_LOGSTASH_INDEX={{ .Values.opensearch.index | default "logstash-*" }}-
+            - ELASTICSEARCH_LOGSTASH_INDEX={{ .Values.opensearch.index | default "logstash" }}-*
             - ELASTICSEARCH_LOGSTASH_ALERT_INDEX={{ .Values.opensearch.index | default "logstash" }}-alert-
             - STAMUSCTL_SEED={{ .Release.seed }}
             - SCIRIUS_VERSION=1.0.0
