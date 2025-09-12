@@ -1,10 +1,10 @@
-# ClearNDR Template
+# Clear NDR Template
 
-This template deploys ClearNDR CE (Community Edition), a comprehensive Network Detection and Response solution built on open-source components.
+This template deploys Clear NDR Community, a comprehensive Network Detection and Response solution built on open-source components.
 
 ## Overview
 
-ClearNDR provides network security monitoring, intrusion detection, and threat analysis capabilities through an integrated stack of security tools. The template orchestrates the deployment of all components using Docker Compose.
+Clear NDR provides network security monitoring, intrusion detection, and threat analysis capabilities through an integrated stack of security tools. The template orchestrates the deployment of all components using Docker Compose.
 
 ## Components
 
