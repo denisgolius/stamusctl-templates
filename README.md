@@ -1,4 +1,4 @@
-# Stamusctl Public Templates
+# Clear NDR Templates
 
 > **Note**: This repository contains configuration templates for [stamusctl](https://github.com/StamusNetworks/stamusctl). For CLI tool issues, please report them to the main stamusctl repository.
 
@@ -10,9 +10,9 @@ For comprehensive documentation, visit [https://docs.clearndr.io/](https://docs.
 
 ## Available Templates
 
-### ClearNDR
+### Clear NDR
 
-The `clearndr` template deploys ClearNDR CE (Community Edition) with the following components:
+The `clearndr` template deploys Clear NDR Community with the following components:
 
 - **Suricata**: Network intrusion detection system
 - **Scirius**: Web-based rule management and event analysis
@@ -26,7 +26,7 @@ The `clearndr` template deploys ClearNDR CE (Community Edition) with the followi
 
 ```
 data/
-├── clearndr/               # ClearNDR template
+├── clearndr/               # Clear NDR template
 │   ├── compose.yml         # Main Docker Compose template
 │   ├── config.yaml         # Template configuration
 │   └── [components]/       # Component-specific configs
@@ -35,7 +35,7 @@ data/
 
 ## Configuration Values
 
-### ClearNDR Template
+### Clear NDR Template
 
 | Key                                 | Default                                 | Usage                                                                                                                            |
 | ----------------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
